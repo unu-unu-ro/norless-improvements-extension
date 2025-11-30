@@ -12,6 +12,7 @@ const changeContentTarget = $("#holder_text");
 // - allod more styling options? (bold, italic, colors, etc, extra classes?)
 // - extract it to a separate extension only for 'norless'
 // - add ending character (*)
+// - italics for "R:" lines
 
 const extensionName = "Project verses from bible.com";
 const defaultBibleExtensionId = "fklnkmnlobkpoiifnbnemdpamheoanpj";
