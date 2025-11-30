@@ -1,0 +1,51 @@
+{
+  "name": "Norless improvements",
+  "version": "1.0.0",
+  "description": "Norless improvements for Projecting Church songs. Sync with [Project verses from bible.com] Extension ✨",
+  "manifest_version": 3,
+  "author": "Matei Nicolae",
+  "background": {
+    "service_worker": "views/background.js"
+  },
+  "action": {},
+  "permissions": ["activeTab", "storage", "clipboardWrite"],
+  "content_scripts": [
+    {
+      "matches": ["http://*.norless.com/*"],
+      "js": ["views/icons/icons.js", "views/common/utilities.js", "views/common/tooltip/tooltip.js", "views/common/simplePrompt/simplePrompt.js"],
+      "css": ["views/common/colors.css", "views/common/tooltip/tooltip.css", "views/common/simplePrompt/simplePrompt.css", "views/common/actions.css"],
+      "run_at": "document_end"
+    },
+
+    {
+      "matches": ["http://app.norless.com/*"],
+      "js": ["views/norless/selectors.js", "views/norless/print.js", "views/norless/bible-verses-integration.js", "views/norless/index.js"]
+    },
+    {
+      "matches": ["http://app.norless.com/template/output.html"],
+      "css": ["views/norless/output-overrides.css"],
+      "js": ["views/norless/runtime-messages.js", "views/norless/bible-verses-integration.js"]
+    },
+
+    {
+      "matches": ["http://app-ua.norless.com/*"],
+      "js": ["views/norless/selectors.js", "views/norless/print.js", "views/norless/bible-verses-integration.js", "views/norless/index.js"]
+    },
+    {
+      "matches": ["http://app-ua.norless.com/template/output.html"],
+      "css": ["views/norless/output-overrides.css"],
+      "js": ["views/norless/runtime-messages.js", "views/norless/bible-verses-integration.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["views/norless/background.jpg"],
+      "matches": ["http://*.norless.com/*"]
+    }
+  ],
+  "icons": {
+    "16": "views/icons/icon-16.png",
+    "48": "views/icons/icon-48.png",
+    "128": "views/icons/icon-128.png"
+  }
+}

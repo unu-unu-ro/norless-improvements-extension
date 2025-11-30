@@ -1,0 +1,32 @@
+{
+  "name": "norless-improvements",
+  "version": "1.0.0",
+  "description": "Norless improvements for Projecting Church songs. Sync with [Project verses from bible.com] Extension ✨",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "watch-test": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unu-unu-ro/norless-improvements-extension.git"
+  },
+  "author": "Nicolae Matei",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/unu-unu-ro/norless-improvements-extension/issues"
+  },
+  "homepage": "https://github.com/unu-unu-ro/norless-improvements-extension#readme",
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/views/common/utilities.js"
+    ]
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^29.4.0",
+    "ts-jest": "^29.0.5"
+  }
+}
