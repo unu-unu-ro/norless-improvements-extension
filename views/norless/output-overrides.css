@@ -43,3 +43,8 @@ body:before {
   left: 0;
   background: rgba(0, 0, 0, var(--backgroundImgOpacity));
 }
+
+.final {
+  color: lightgrey;
+  visibility: hidden;
+}

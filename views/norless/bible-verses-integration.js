@@ -11,13 +11,15 @@ const changeContentTarget = $("#holder_text");
 // TODOs:
 // - allod more styling options? (bold, italic, colors, etc, extra classes?)
 // - extract it to a separate extension only for 'norless'
-// - add ending character (*)
 // - italics for "R:" lines
 
 const extensionName = "Project verses from bible.com";
 const defaultBibleExtensionId = "fklnkmnlobkpoiifnbnemdpamheoanpj";
 
 let lastProjectedText = "";
+
+//const finalCharacter = " ✝";
+const finalCharacter = '<span class="final" style="position: relative;top: -0.5em;font-size: 80%;font-style: normal;">🌤</span>';
 
 const shortWindowNameMapping = {
   0: "Disabled",
@@ -100,7 +102,12 @@ function onTextChanged(splitTitle) {
   const textWrapper = $("div", changeContentTarget);
   // using innerText to get only visible parts and ignore chord (eg. <span class="chord">Intro</span>)
   // TODO remove 'strong' tag and allow styling from projected text?
-  const paragraphs = $$("p", textWrapper).map(p => p.innerText);
+  const paragraphs = $$("p", textWrapper).map(p => {
+    if (p.querySelector(".final")) {
+      return p.innerText + finalCharacter;
+    }
+    return p.innerText;
+  });
 
   const nextLine = $("#holder_next_line div")?.innerText;
 
