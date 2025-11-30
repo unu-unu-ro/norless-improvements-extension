@@ -10,8 +10,6 @@ const changeContentTarget = $("#holder_text");
 
 // TODOs:
 // - allod more styling options? (bold, italic, colors, etc, extra classes?)
-// - extract it to a separate extension only for 'norless'
-// - italics for "R:" lines
 
 const extensionName = "Project verses from bible.com";
 const defaultBibleExtensionId = "fklnkmnlobkpoiifnbnemdpamheoanpj";
@@ -39,9 +37,10 @@ const windowNameMapping = {
 // Project Text Utilities
 // =======================
 
-function getTextToProject({ progress, key, title, paragraphs, nextLine } = {}) {
+function getTextToProject({ progress, key, title, refrain, paragraphs, nextLine } = {}) {
   // leave some space at bottom if next line exists (1.2em should be enough for one line)
   const nextLineStyle = "opacity: 0.5; position: fixed; bottom: 10px; font-size: 0.7em;";
+  const refrainStyle = refrain ? "font-style: italic;" : "";
 
   return `
     <h1 class="reference" style="font-variant-caps: normal; letter-spacing: normal;">
@@ -49,7 +48,7 @@ function getTextToProject({ progress, key, title, paragraphs, nextLine } = {}) {
       ${key ? `<span class="version" style="font-size: 0.8em; opacity: 1;">${key}</span>` : ""}
       <span style="opacity: 0.6">${title}</span>
     </h1>
-    <div class="singlelines bold" style="${nextLine ? "padding: 0 0 1.2em 0;" : ""}">
+    <div class="singlelines bold" style="${nextLine ? "padding: 0 0 1.2em 0;" : ""}; ${refrainStyle}">
       ${paragraphs.map(line => `<p><strong>${line}</strong></p>`).join("")}
     </div>
     ${nextLine ? `<div class="singlelines nextline" style="${nextLineStyle}"><p><strong>${nextLine}</strong></p></div>` : ""}
@@ -91,9 +90,10 @@ function getProjectIndexes(displayWindow) {
   return [];
 }
 
-function onTextChanged(splitTitle) {
+function onTextChanged(splitTitle, italicRefrainStyle) {
   const { extensionId, displayWindow } = getProjectTextSettings();
   const indexes = getProjectIndexes(displayWindow);
+  const refrain = italicRefrainStyle && !!$("#container.form_R");
 
   const progress = $("#holder_slide_progress").innerText;
   const key = $("#holder_key_signature").innerText;
@@ -115,7 +115,7 @@ function onTextChanged(splitTitle) {
     title = title.split("/")[1].trim();
   }
 
-  const textToProject = getTextToProject({ progress, key, title, paragraphs, nextLine });
+  const textToProject = getTextToProject({ progress, key, title, refrain, paragraphs, nextLine });
 
   if (textToProject === lastProjectedText) {
     console.info("Norless text unchanged, not projecting");
@@ -141,11 +141,12 @@ function initEventsOnTextChanged() {
   }
 
   const splitTitle = window.location.hostname === "app-ua.norless.com";
+  const italicRefrainStyle = !splitTitle;
 
   const observer = new MutationObserver(mutations => {
     mutations.forEach(() => {
       console.info("Norless text changed");
-      onTextChanged(splitTitle);
+      onTextChanged(splitTitle, italicRefrainStyle);
     });
   });
   observer.observe(changeContentTarget, {
