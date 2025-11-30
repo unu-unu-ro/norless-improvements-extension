@@ -14,7 +14,7 @@ Shift + Right Click on song list to open context menu with options:
   - [x] 🎨 Color
   - [x] 🧩 Image
   - [x] ⬛ Opacity
-- [x] 📖 Project verses from bible.com
+- [x] 📖 Project verses from bible.com (install: [here](https://chrome.google.com/webstore/detail/project-verses-from-biblecom/fklnkmnlobkpoiifnbnemdpamheoanpj))
 
 ## ⚙ Setup Plugin as Developer
 
