@@ -211,7 +211,7 @@ async function initEvents() {
 
     const playlist = await waitElement("#playlist");
     playlist &&
-      playlist.addEventListener(
+      document.body.addEventListener(
         "contextmenu",
         function (e) {
           // Allow native Chrome context menu when CTRL is pressed
