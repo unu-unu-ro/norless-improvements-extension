@@ -25,29 +25,38 @@ function getPlaylistDoc(target, titlePrefix = "", repeatChorus = false, actions 
   return getPrintPage(body, docTitle, actions);
 }
 
+// TODO when multiple "R:" refrains exist, but content differs, make sure to repeat all refrains"
+//   - check: "Zi de zi, în fiecare clipă" song
 function mapBody(target, nl = "<br />", titlePrefix = "", repeatChorus = false) {
   const songs = getSongsEntries(target);
   let body = Object.values(songs)
-    .map(e => {
+    .map(({ title, slides }) => {
       const forms = {};
       return {
-        title: e.title,
-        slides: e.slides
-          ? e.slides
-              .map(s => {
-                let text = "";
-                if (s.form) {
-                  if (forms[s.form]) {
-                    if (!repeatChorus) {
-                      return `${s.form}\n`;
+        title,
+        slides: slides
+          ? slides
+              .map(({ form, text }) => {
+                let songText = "";
+                const currentSlide = text.replaceAll("\n", `${nl}\n`).replaceAll('<span class="final">*</span>', "");
+                if (form) {
+                  if (forms[form]) {
+                    if (forms[form] !== currentSlide) {
+                      console.info("ℹ️ \x1b[30m\x1b[41m [%s] \x1b[0m : %o", "Song warning", title);
+                      console.info(`Different content for same refrains %o:`, form);
+                      console.info("Current slide  : %o", currentSlide);
+                      console.info("Previous slide : %o", forms[form]);
+                      songText = `${form}:${nl}`;
+                    } else if (!repeatChorus) {
+                      return `${form}\n`;
                     }
                   } else {
-                    forms[s.form] = 1;
-                    text = `${s.form}:${nl}`;
+                    forms[form] = currentSlide;
+                    songText = `${form}:${nl}`;
                   }
                 }
-                text += s.text.replaceAll("\n", `${nl}\n`);
-                return text;
+                songText += currentSlide;
+                return songText;
               })
               .join(`${nl}${nl}\n\n`)
           : ""
