@@ -21,7 +21,7 @@ function getCommonMenuItems(e) {
           [
             {
               text: "Color",
-              icon: backgroundMode === "color" ? icons.checked : icons.unchecked,
+              icon: backgroundMode === "color" ? icons.checkedRadio : icons.uncheckedRadio,
               itemId: "pageBackgroundColor",
               rightIcon: "🎨",
               shortcut: getPageBackgroundColor(),
@@ -34,7 +34,7 @@ function getCommonMenuItems(e) {
             },
             {
               text: "Image",
-              icon: backgroundMode === "image" ? icons.checked : icons.unchecked,
+              icon: backgroundMode === "image" ? icons.checkedRadio : icons.uncheckedRadio,
               itemId: "backgroundImage",
               rightIcon: "🧩",
               handler: async () => {
@@ -115,7 +115,7 @@ function getProjectWindowsSelectionMenu(win) {
   return [0, 1, 2, 3].map(n => {
     return {
       text: windowNameMapping[n],
-      icon: win === n ? icons.checked : icons.unchecked,
+      icon: win === n ? icons.checkedRadio : icons.uncheckedRadio,
       itemId: "projectWindow" + n,
       data: {
         state: n
