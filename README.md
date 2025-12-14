@@ -6,7 +6,7 @@
 
 ## 💠 Features
 
-Shift + Right Click on song list to open context menu with options:
+`Shift + Right Click` on song list to open context menu with options:
 
 - [x] 📩 Save Playlist as HTML
 - [x] 📋 Copy Playlist to Clipboard
