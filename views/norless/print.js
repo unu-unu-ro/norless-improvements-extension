@@ -109,6 +109,11 @@ function getPrintPage(body, docTitle, actions = false) {
       .toolbar {
         display: flex;
         justify-content: flex-end;
+        gap: 8px;
+        align-items: center;
+      }
+      .toolbar a { 
+        text-decoration: underline;
       }
       button {
         cursor: pointer;
@@ -134,6 +139,9 @@ function getPrintPage(body, docTitle, actions = false) {
       .dark-mode h1 {
         color: #efef00;
       }
+      .separator {
+        color: #66666688;
+      }
 	</style>
   </head>
   <body>
@@ -142,6 +150,8 @@ function getPrintPage(body, docTitle, actions = false) {
       actions
         ? `
       <div class="toolbar">
+        <span>2025</span>
+        <span class="separator">|</span>
         <button id="lightMode" onclick="toggleDisplayMode()" disabled>🌞</button>
         <button id="darkMode" onclick="toggleDisplayMode()">🌒</button>
       </div>
