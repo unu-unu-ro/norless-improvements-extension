@@ -1,6 +1,6 @@
 {
   "name": "Norless improvements",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Norless improvements for Projecting Church songs. Sync with [Project verses from bible.com] Extension ✨",
   "manifest_version": 3,
   "author": "Matei Nicolae",
@@ -12,14 +12,32 @@
   "content_scripts": [
     {
       "matches": ["http://*.norless.com/*"],
-      "js": ["views/icons/icons.js", "views/common/utilities.js", "views/common/tooltip/tooltip.js", "views/common/simplePrompt/simplePrompt.js"],
-      "css": ["views/common/colors.css", "views/common/tooltip/tooltip.css", "views/common/simplePrompt/simplePrompt.css", "views/common/actions.css"],
+      "js": [
+        "views/icons/icons.js",
+        "views/common/utilities.js",
+        "views/common/tooltip/tooltip.js",
+        "views/common/simplePrompt/simplePrompt.js",
+        "views/common/toast/toast.js"
+      ],
+      "css": [
+        "views/common/colors.css",
+        "views/common/tooltip/tooltip.css",
+        "views/common/simplePrompt/simplePrompt.css",
+        "views/common/actions.css",
+        "views/common/toast/toast.css"
+      ],
       "run_at": "document_end"
     },
 
     {
       "matches": ["http://app.norless.com/*"],
-      "js": ["views/norless/selectors.js", "views/norless/print.js", "views/norless/bible-verses-integration.js", "views/norless/index.js"]
+      "js": [
+        "views/norless/selectors.js",
+        "views/norless/print.js",
+        "views/norless/bible-verses-integration.js",
+        "views/norless/index.js",
+        "views/norless/sync.js"
+      ]
     },
     {
       "matches": ["http://app.norless.com/template/output.html"],
@@ -29,7 +47,13 @@
 
     {
       "matches": ["http://app-ua.norless.com/*"],
-      "js": ["views/norless/selectors.js", "views/norless/print.js", "views/norless/bible-verses-integration.js", "views/norless/index.js"]
+      "js": [
+        "views/norless/selectors.js",
+        "views/norless/print.js",
+        "views/norless/bible-verses-integration.js",
+        "views/norless/index.js",
+        "views/norless/sync.js"
+      ]
     },
     {
       "matches": ["http://app-ua.norless.com/template/output.html"],

@@ -1,6 +1,6 @@
 {
   "name": "norless-improvements",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Norless improvements for Projecting Church songs. Sync with [Project verses from bible.com] Extension ✨",
   "main": "index.js",
   "scripts": {

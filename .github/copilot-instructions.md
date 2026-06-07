@@ -23,6 +23,7 @@ views/
   │   ├── utilities.js        # Helper functions ($, $$, waitElement, etc.)
   │   ├── colors.css          # Shared color variables
   │   ├── simplePrompt/       # Custom prompt dialogs
+  │   ├── toast/             # Toast notifications (showToast)
   │   └── tooltip/            # Context menu system
   ├── [website-domain]/       # Website-specific enhancements
   │   ├── index.js           # Site-specific functionality
@@ -66,6 +67,7 @@ Always use these existing utilities from `views/common/utilities.js`:
 - `waitElement(selector, timeout)` - Wait for element to appear
 - `debounce(fn, delay)` - Debounce function calls
 - `copyToClipboard(text)` - Copy text to clipboard
+- `showToast(message, type, duration)` - Transient toast notification (from `views/common/toast/toast.js`)
 
 ### Context Menu Pattern
 
@@ -123,6 +125,27 @@ try {
   // Handle gracefully - extension may not be installed
 }
 ```
+
+### Cross-Origin / Cross-Tab Communication
+
+`window.postMessage` and `BroadcastChannel` only work same-origin, so to bridge tabs on
+**different** origins (e.g. `app.norless.com` → `app-ua.norless.com`) use `chrome.storage`
+as a message bus. `chrome.storage.onChanged` fires in the content scripts of every tab,
+including the other origin, and needs only the already-granted `storage` permission (no
+service-worker relay).
+
+```javascript
+// Sender (writes a command; include a unique id so identical repeats still fire onChanged)
+chrome.storage.local.set({ commandKey: { id: Date.now() + "-" + counter++, action, payload } });
+
+// Receiver (in the other tab)
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== "local" || !changes.commandKey) return;
+  handleCommand(changes.commandKey.newValue);
+});
+```
+
+See `views/norless/sync.js` for the RO → UA selection-sync implementation.
 
 ### Content Script Structure
 

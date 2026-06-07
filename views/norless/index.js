@@ -287,7 +287,21 @@ function setBackgroundImageOpacity(opacity) {
 
 function showContextMenu(e) {
   const storeText = "this.setAttribute('data-text', JSON.stringify(Entries._collection._docs._map))";
+  // Sync (RO → UA) is only driven from the source app.
+  const syncMenuItems =
+    window.location.hostname === "app.norless.com"
+      ? [
+          {
+            text: "Sync to 🇺🇦 app-ua",
+            icon: isSyncEnabled() ? icons.checkedRadio : icons.uncheckedRadio,
+            itemId: "toggleSync",
+            handler: () => toggleSync()
+          },
+          "-"
+        ]
+      : [];
   const menu = getContextMenu([
+    ...syncMenuItems,
     {
       text: "Save Playlist as HTML",
       icon: icons.export,
