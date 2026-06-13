@@ -82,12 +82,15 @@ function initSyncSource() {
     true
   );
 
-  // ESC stops projecting — mirror it to UA.
+  // Mirror navigation/projection keys to UA. PageUp/PageDown move between
+  // slides without a click, so the click handler above never sees them.
   document.addEventListener(
     "keydown",
     e => {
       if (e.key === "Escape") {
         sendCmd("stopProjecting", {});
+      } else if (e.key === "PageUp" || e.key === "PageDown") {
+        sendCmd("navigate", { key: e.key });
       }
     },
     true
@@ -161,16 +164,29 @@ async function selectSlide({ index, totalSlides }) {
   slide && slide.click();
 }
 
+// Map the keys we mirror to their code / keyCode so norless's own handlers fire.
+const KEY_INFO = {
+  Escape: { code: "Escape", keyCode: 27 },
+  PageUp: { code: "PageUp", keyCode: 33 },
+  PageDown: { code: "PageDown", keyCode: 34 }
+};
+
 /**
- * Simulate pressing the Escape key, which stops projecting in norless.
+ * Re-dispatch a keyboard event on the UA tab so norless reacts as if the user
+ * pressed the key there (Escape stops projecting, PageUp/PageDown change slide).
+ * @param {String} key
  */
-function simulateEscape() {
+function simulateKey(key) {
+  const info = KEY_INFO[key];
+  if (!info) {
+    return;
+  }
   ["keydown", "keyup"].forEach(type => {
     const event = new KeyboardEvent(type, {
-      key: "Escape",
-      code: "Escape",
-      keyCode: 27,
-      which: 27,
+      key,
+      code: info.code,
+      keyCode: info.keyCode,
+      which: info.keyCode,
       bubbles: true,
       cancelable: true
     });
@@ -186,8 +202,13 @@ function handleCommand(command) {
     selectSong(command.payload);
   } else if (command.action === "selectSlide") {
     selectSlide(command.payload);
+  } else if (command.action === "navigate") {
+    // Relative slide navigation — only mirror once a matching song is selected.
+    if (syncState.found) {
+      simulateKey(command.payload.key);
+    }
   } else if (command.action === "stopProjecting") {
-    simulateEscape();
+    simulateKey("Escape");
   }
 }
 
