@@ -7,8 +7,12 @@
   "background": {
     "service_worker": "views/background.js"
   },
-  "action": {},
+  "action": {
+    "default_popup": "views/popup/popup.html",
+    "default_title": "Norless improvements"
+  },
   "permissions": ["activeTab", "storage", "clipboardWrite"],
+  "host_permissions": ["http://app.norless.com/*", "http://app-ua.norless.com/*"],
   "content_scripts": [
     {
       "matches": ["http://*.norless.com/*"],

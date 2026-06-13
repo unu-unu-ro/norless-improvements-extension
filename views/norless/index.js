@@ -209,6 +209,8 @@ async function initEvents() {
       }
     });
 
+    initPopupBridge();
+
     const playlist = await waitElement("#playlist");
     playlist &&
       document.body.addEventListener(
@@ -223,6 +225,101 @@ async function initEvents() {
         false
       );
   }
+}
+
+// =======================
+// Toolbar popup bridge (RPC endpoint for views/popup/)
+// =======================
+// The popup runs in the extension context and cannot read the page's localStorage
+// directly, so it talks to this content script (which shares the page's localStorage)
+// via chrome.tabs.sendMessage. All handlers reuse the existing settings functions.
+
+function getPopupState() {
+  const settings = getProjectTextSettings();
+  return {
+    host: window.location.hostname,
+    displayWindow: settings.displayWindow,
+    extensionId: settings.extensionId,
+    backgroundMode: getBackgroundMode(),
+    color: getPageBackgroundColor(),
+    opacity: getBackgroundImgOpacity(),
+    syncEnabled: isSyncEnabled()
+  };
+}
+
+// Bridge to the page's main world to read `Entries._collection._docs._map`
+// (unreachable from the isolated content script). Mirrors the inline `onmouseenter`
+// snippet used by the right-click menu — the attribute handler runs in the page
+// context and stamps the playlist JSON onto a DOM attribute we can then read.
+function readSongsTarget() {
+  const el = document.createElement("div");
+  el.setAttribute("data-text", "{}");
+  el.setAttribute("onmouseenter", "this.setAttribute('data-text', JSON.stringify(Entries._collection._docs._map))");
+  document.body.appendChild(el);
+  el.dispatchEvent(new Event("mouseenter"));
+  el.remove();
+  return el;
+}
+
+function initPopupBridge() {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    (async () => {
+      try {
+        const settings = getProjectTextSettings();
+        switch (message.action) {
+          case "getState":
+            sendResponse(getPopupState());
+            break;
+          case "setDisplayWindow":
+            saveProjectTextSettings({ ...settings, displayWindow: message.value });
+            sendResponse({ ok: true });
+            break;
+          case "setExtensionId":
+            saveProjectTextSettings({ ...settings, extensionId: message.id });
+            sendResponse({ ok: true });
+            break;
+          case "setBackgroundMode": {
+            const mode = message.mode === "image" ? "image" : "color";
+            localStorage.setItem(backgroundMode, mode);
+            document.body.classList.toggle("background-image", mode === "image");
+            notifyOutputWindows({ action: "toggleBackground", mode });
+            sendResponse({ ok: true });
+            break;
+          }
+          case "setColor":
+            setPageBackgroundColor(message.color);
+            sendResponse({ ok: true });
+            break;
+          case "setOpacity":
+            setBackgroundImageOpacity(message.opacity);
+            sendResponse({ ok: true });
+            break;
+          case "toggleSync":
+            sendResponse({ syncEnabled: toggleSync() });
+            break;
+          case "savePlaylist":
+            saveAsHTML(readSongsTarget());
+            sendResponse({ ok: true });
+            break;
+          case "copyPlaylist": {
+            // Render the playlist to plain text here, but let the popup write it to the
+            // clipboard — execCommand("copy") needs the page focused, which it isn't
+            // while the popup is open.
+            const html = getPlaylistDoc(readSongsTarget(), "📌 ", false);
+            const text = await getInnerToClipboard(html);
+            sendResponse({ text });
+            break;
+          }
+          default:
+            sendResponse({ error: "unknown action" });
+        }
+      } catch (error) {
+        console.debug("Popup bridge error:", error.message);
+        sendResponse({ error: error.message });
+      }
+    })();
+    return true; // keep the message channel open for the async sendResponse
+  });
 }
 
 function showOutputContextMenu(e) {

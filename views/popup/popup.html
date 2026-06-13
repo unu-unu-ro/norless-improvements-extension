@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Norless improvements</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <div class="pages">
+        <button class="page-link" data-page="ro" type="button">
+          <span class="dot" data-page="ro"></span>
+          <span class="flag">🇷🇴</span>
+          <span class="name">app.norless</span>
+        </button>
+        <button class="page-link" data-page="ua" type="button">
+          <span class="dot" data-page="ua"></span>
+          <span class="flag">🇺🇦</span>
+          <span class="name">app-ua.norless</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section id="windows">
+        <h2><span class="ic" id="projectIcon"></span><span>Project verses from bible.com</span></h2>
+        <div id="windowRows" class="window-rows"></div>
+        <p id="conflictNote" class="note hidden">⚠️ A window is claimed by both pages. Re-assign it to fix.</p>
+      </section>
+
+      <div id="syncRow" class="sync-row"></div>
+
+      <section id="playlist">
+        <h2>📃 Playlist <span id="activeLabel" class="muted"></span></h2>
+        <div class="btns">
+          <button id="saveBtn" type="button"><span class="ic"></span><span>Save as HTML</span></button>
+          <button id="copyBtn" type="button"><span class="ic"></span><span>Copy</span></button>
+        </div>
+      </section>
+
+      <details id="settings">
+        <summary><span>⚙️ Background &amp; Extension ID</span><span class="chevron ic"></span></summary>
+        <div id="settingsBody" class="settings-body"></div>
+      </details>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="../icons/icons.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
