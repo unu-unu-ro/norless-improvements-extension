@@ -369,6 +369,7 @@ function wireStaticControls() {
   document.querySelector("#saveBtn .ic").innerHTML = icons.lightSave;
   document.querySelector("#copyBtn .ic").innerHTML = icons.lightCopy;
   document.querySelector("#settings .chevron").innerHTML = icons.rightArrow;
+  document.querySelector("#settingsIcon").innerHTML = icons.lightSettings;
   document.querySelector("#projectIcon").innerHTML = icons.lightLiveChat;
 
   document.getElementById("saveBtn").addEventListener("click", async () => {
