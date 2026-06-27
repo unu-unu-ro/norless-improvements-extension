@@ -18,6 +18,13 @@ const HOSTS = {
 
 const WINDOW_LABELS = { 1: "Window 1", 2: "Window 2" };
 
+// Fallback for the bible.com projection extension when nothing is stored yet
+// (mirrors defaultBibleExtensionId in views/norless/bible-verses-integration.js).
+const DEFAULT_EXTENSION_ID = "fklnkmnlobkpoiifnbnemdpamheoanpj";
+
+// The extension this id targets (mirrors extensionName in bible-verses-integration.js).
+const TARGET_EXTENSION_NAME = "Project verses from bible.com";
+
 // Latest snapshot: { ro: state|null, ua: state|null, active: { key, tab } | null }
 let state = { ro: null, ua: null, active: null };
 
@@ -201,80 +208,38 @@ function renderPlaylist() {
   }
 }
 
+// Settings (background color + extension ID) live in chrome.storage.sync, shared across
+// both pages and every device — so we read/write them directly here and show them always,
+// whether or not a Norless tab is open. Open tabs pick up changes via chrome.storage.onChanged.
 function renderSettings() {
   const body = document.getElementById("settingsBody");
   body.innerHTML = "";
 
-  ["ro", "ua"].forEach(key => {
-    const cfg = HOSTS[key];
-    const pageState = state[key];
-    const block = document.createElement("div");
-    block.className = "page-settings";
+  const settings = state.settings || {};
+  const color = settings.pageBackgroundColor || "#000000";
 
-    const h3 = document.createElement("h3");
-    h3.textContent = `${cfg.flag} ${cfg.name} (${cfg.host})`;
-    block.appendChild(h3);
-
-    if (!pageState) {
-      const note = document.createElement("div");
-      note.className = "closed-note";
-      note.textContent = "Tab not open.";
-      block.appendChild(note);
-      body.appendChild(block);
-      return;
-    }
-
-    block.appendChild(buildBackgroundFields(key, pageState));
-    block.appendChild(buildExtensionIdField(key, pageState));
-    body.appendChild(block);
-  });
+  const block = document.createElement("div");
+  block.className = "page-settings";
+  block.appendChild(buildBackgroundField(color));
+  block.appendChild(buildExtensionIdField(!!settings.useCustomExtensionId, settings.bibleExtensionId || ""));
+  body.appendChild(block);
 }
 
-function buildBackgroundFields(key, pageState) {
-  const frag = document.createDocumentFragment();
-  const host = HOSTS[key].host;
-
-  // Mode radios
-  const modeField = document.createElement("div");
-  modeField.className = "field";
-  const modeLabel = document.createElement("label");
-  modeLabel.textContent = "Background";
-  modeField.appendChild(modeLabel);
-
-  const radios = document.createElement("div");
-  radios.className = "radios";
-  ["color", "image"].forEach(mode => {
-    const wrap = document.createElement("label");
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = `bgmode-${key}`;
-    radio.checked = pageState.backgroundMode === mode;
-    radio.addEventListener("change", async () => {
-      await send(host, { action: "setBackgroundMode", mode });
-      pageState.backgroundMode = mode;
-    });
-    wrap.appendChild(radio);
-    wrap.appendChild(document.createTextNode(mode === "color" ? "🎨 Color" : "🧩 Image"));
-    radios.appendChild(wrap);
-  });
-  modeField.appendChild(radios);
-  frag.appendChild(modeField);
-
-  // Color picker
+function buildBackgroundField(currentColor) {
   const colorField = document.createElement("div");
   colorField.className = "field";
   const colorLabel = document.createElement("label");
-  colorLabel.textContent = "Color";
+  colorLabel.textContent = "Background";
   colorField.appendChild(colorLabel);
   const color = document.createElement("input");
   color.type = "color";
-  color.value = normalizeColor(pageState.color);
+  color.value = normalizeColor(currentColor);
   const colorText = document.createElement("input");
   colorText.type = "text";
-  colorText.value = pageState.color;
-  const applyColor = async value => {
-    await send(host, { action: "setColor", color: value });
-    pageState.color = value;
+  colorText.value = currentColor;
+  const applyColor = value => {
+    chrome.storage.sync.set({ pageBackgroundColor: value });
+    if (state.settings) state.settings.pageBackgroundColor = value;
   };
   color.addEventListener("change", () => {
     colorText.value = color.value;
@@ -286,43 +251,68 @@ function buildBackgroundFields(key, pageState) {
   });
   colorField.appendChild(color);
   colorField.appendChild(colorText);
-  frag.appendChild(colorField);
-
-  // Opacity
-  const opacityField = document.createElement("div");
-  opacityField.className = "field";
-  const opacityLabel = document.createElement("label");
-  opacityLabel.textContent = "Img opacity %";
-  opacityField.appendChild(opacityLabel);
-  const opacity = document.createElement("input");
-  opacity.type = "number";
-  opacity.min = "0";
-  opacity.max = "100";
-  opacity.value = pageState.opacity;
-  opacity.addEventListener("change", async () => {
-    await send(host, { action: "setOpacity", opacity: opacity.value });
-    pageState.opacity = opacity.value;
-  });
-  opacityField.appendChild(opacity);
-  frag.appendChild(opacityField);
-
-  return frag;
+  return colorField;
 }
 
-function buildExtensionIdField(key, pageState) {
+// Extension ID: defaults to the fixed production id (read-only). Tick "Custom" to type a
+// different id. Unticking switches back to production but keeps the stored custom value,
+// so re-ticking restores it.
+function buildExtensionIdField(useCustom, customId) {
   const field = document.createElement("div");
-  field.className = "field";
+  field.className = "field stacked divided";
+
+  const target = document.createElement("strong");
+  target.className = "target-ext";
+  target.textContent = TARGET_EXTENSION_NAME;
+  field.appendChild(target);
+
+  const head = document.createElement("div");
+  head.className = "ext-head";
+
   const label = document.createElement("label");
   label.textContent = "Extension ID";
-  field.appendChild(label);
+  head.appendChild(label);
+
+  const checkWrap = document.createElement("label");
+  checkWrap.className = "check";
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = useCustom;
+  checkWrap.appendChild(checkbox);
+  checkWrap.appendChild(document.createTextNode("Custom"));
+  head.appendChild(checkWrap);
+
+  field.appendChild(head);
+
   const input = document.createElement("input");
   input.type = "text";
-  input.value = pageState.extensionId;
   input.spellcheck = false;
-  input.addEventListener("change", async () => {
-    await send(HOSTS[key].host, { action: "setExtensionId", id: input.value.trim() });
-    pageState.extensionId = input.value.trim();
+
+  const renderInput = () => {
+    if (checkbox.checked) {
+      input.readOnly = false;
+      input.value = customId;
+      input.placeholder = "custom extension id";
+    } else {
+      input.readOnly = true;
+      input.value = DEFAULT_EXTENSION_ID;
+      input.title = "Production id (not changeable)";
+    }
+  };
+  renderInput();
+
+  checkbox.addEventListener("change", () => {
+    chrome.storage.sync.set({ useCustomExtensionId: checkbox.checked });
+    if (state.settings) state.settings.useCustomExtensionId = checkbox.checked;
+    renderInput();
   });
+  input.addEventListener("change", () => {
+    if (!checkbox.checked) return; // production id is fixed
+    customId = input.value.trim();
+    chrome.storage.sync.set({ bibleExtensionId: customId });
+    if (state.settings) state.settings.bibleExtensionId = customId;
+  });
+
   field.appendChild(input);
   return field;
 }
@@ -361,8 +351,13 @@ async function openOrFocus(key) {
 }
 
 async function refresh() {
-  const [ro, ua, active] = await Promise.all([send(HOSTS.ro.host, { action: "getState" }), send(HOSTS.ua.host, { action: "getState" }), getActiveNorlessTab()]);
-  state = { ro, ua, active };
+  const [ro, ua, active, settings] = await Promise.all([
+    send(HOSTS.ro.host, { action: "getState" }),
+    send(HOSTS.ua.host, { action: "getState" }),
+    getActiveNorlessTab(),
+    chrome.storage.sync.get(["pageBackgroundColor", "bibleExtensionId", "useCustomExtensionId"])
+  ]);
+  state = { ro, ua, active, settings };
   render();
 }
 

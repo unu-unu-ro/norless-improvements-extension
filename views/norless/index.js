@@ -1,63 +1,18 @@
-const backgroundImgOpacity = "backgroundImgOpacity";
-const pageBackgroundColor = "pageBackgroundColor";
-const backgroundMode = "backgroundMode";
-
-// Track output windows opened from this page
-let outputWindows = [];
-
 function getCommonMenuItems(e) {
   const settings = getProjectTextSettings();
-  const backgroundMode = getBackgroundMode();
 
   return [
     {
       text: "Background",
-      shortcut: backgroundMode === "color" ? getPageBackgroundColor() : "Image",
-      rightIcon: icons.rightArrow,
+      shortcut: getPageBackgroundColor(),
       icon: "🎨",
       itemId: "background-settings",
       handler: async () => {
-        const menu = getContextMenu(
-          [
-            {
-              text: "Color",
-              icon: backgroundMode === "color" ? icons.checkedRadio : icons.uncheckedRadio,
-              itemId: "pageBackgroundColor",
-              rightIcon: "🎨",
-              shortcut: getPageBackgroundColor(),
-              handler: async () => {
-                await toggleBackgroundMode("color");
-                const oldColor = getPageBackgroundColor();
-                const color = await simplePrompt("set background color (eg. #82663a)", oldColor);
-                setPageBackgroundColor(color);
-              }
-            },
-            {
-              text: "Image",
-              icon: backgroundMode === "image" ? icons.checkedRadio : icons.uncheckedRadio,
-              itemId: "backgroundImage",
-              rightIcon: "🧩",
-              handler: async () => {
-                await toggleBackgroundMode("image");
-              }
-            },
-            "-",
-            {
-              text: "Opacity",
-              icon: icons.settings,
-              itemId: "backgroundImgOpacity",
-              //rightIcon: "⬛",
-              shortcut: getBackgroundImgOpacity() + "%",
-              handler: async () => {
-                const oldOpacity = getBackgroundImgOpacity();
-                const opacity = await simplePrompt("set opacity percentage [ 0 - 100 ]", oldOpacity);
-                setBackgroundImageOpacity(opacity);
-              }
-            }
-          ],
-          true
-        );
-        showByCursor(menu, e);
+        const oldColor = getPageBackgroundColor();
+        const color = await simplePrompt("set background color (eg. #82663a)", oldColor);
+        if (color) {
+          setPageBackgroundColor(color);
+        }
       }
     },
     {
@@ -83,13 +38,11 @@ function getCommonMenuItems(e) {
                   `
                     <p>Sync with EXTENSION_ID for [${extensionName}]!</p>
                     <p style="line-height: 2.3em">Default Production ID: <span class="key-code">${defaultBibleExtensionId}</span></p>
+                    <p style="opacity: 0.7">Leave empty to use the production id.</p>
                   `,
                   settings.extensionId
                 );
-                saveProjectTextSettings({
-                  ...settings,
-                  extensionId: EXTENSION_ID
-                });
+                setCustomBibleExtensionId(EXTENSION_ID);
               }
             }
           ],
@@ -126,15 +79,8 @@ function getProjectWindowsSelectionMenu(win) {
   });
 }
 
-function getBackgroundMode() {
-  return localStorage.getItem(backgroundMode) || "color";
-}
-
 function getPageBackgroundColor() {
-  return localStorage.getItem(pageBackgroundColor) || "#000000";
-}
-function getBackgroundImgOpacity() {
-  return localStorage.getItem(backgroundImgOpacity) || "0";
+  return getStoredSetting("pageBackgroundColor", "#000000");
 }
 
 function updateAppTitle() {
@@ -161,54 +107,16 @@ async function initEvents() {
       },
       false
     );
-    const backgroundMode = getBackgroundMode();
-    if (backgroundMode === "image") {
-      document.body.classList.add("background-image");
-    }
-
-    // Listen for messages from main page
-    window.addEventListener("message", e => {
-      // Verify message is from same origin
-      if (e.origin !== window.location.origin) return;
-
-      const message = e.data;
-      if (message.action === "toggleBackground") {
-        document.body.classList.remove("background-image");
-        if (message.mode === "image") {
-          document.body.classList.add("background-image");
-        }
-        localStorage.setItem(backgroundMode, message.mode);
-      } else if (message.action === "updateOpacity") {
-        setBackgroundImageOpacity(message.opacity);
-      } else if (message.action === "updateColor") {
-        setPageBackgroundColor(message.color);
+    // Apply the stored background color, and keep it live: chrome.storage.onChanged
+    // fires here whenever the main page (any origin) changes the color.
+    await settingsReady;
+    applyBackgroundColor(getPageBackgroundColor());
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === "sync" && changes.pageBackgroundColor) {
+        applyBackgroundColor(changes.pageBackgroundColor.newValue);
       }
     });
-
-    // Register this window with opener
-    if (window.opener && !window.opener.closed) {
-      window.opener.postMessage({ action: "registerOutput" }, window.location.origin);
-    }
-
-    const opacity = getBackgroundImgOpacity();
-    setBackgroundImageOpacity(opacity);
-
-    const pageBackgroundColor = getPageBackgroundColor();
-    setPageBackgroundColor(pageBackgroundColor);
   } else {
-    // Listen for output window registration
-    window.addEventListener("message", e => {
-      if (e.origin !== window.location.origin) return;
-
-      if (e.data.action === "registerOutput" && e.source) {
-        // Add to tracked windows if not already present
-        if (!outputWindows.includes(e.source)) {
-          outputWindows.push(e.source);
-          console.info("Output window registered");
-        }
-      }
-    });
-
     initPopupBridge();
 
     const playlist = await waitElement("#playlist");
@@ -230,19 +138,15 @@ async function initEvents() {
 // =======================
 // Toolbar popup bridge (RPC endpoint for views/popup/)
 // =======================
-// The popup runs in the extension context and cannot read the page's localStorage
-// directly, so it talks to this content script (which shares the page's localStorage)
-// via chrome.tabs.sendMessage. All handlers reuse the existing settings functions.
+// The popup talks to this content script via chrome.tabs.sendMessage so it can drive
+// page-specific actions (playlist export, displayWindow assignment) and read the live
+// settings cache. All handlers reuse the existing settings functions.
 
 function getPopupState() {
   const settings = getProjectTextSettings();
   return {
     host: window.location.hostname,
     displayWindow: settings.displayWindow,
-    extensionId: settings.extensionId,
-    backgroundMode: getBackgroundMode(),
-    color: getPageBackgroundColor(),
-    opacity: getBackgroundImgOpacity(),
     syncEnabled: isSyncEnabled()
   };
 }
@@ -265,6 +169,7 @@ function initPopupBridge() {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (async () => {
       try {
+        await settingsReady;
         const settings = getProjectTextSettings();
         switch (message.action) {
           case "getState":
@@ -272,26 +177,6 @@ function initPopupBridge() {
             break;
           case "setDisplayWindow":
             saveProjectTextSettings({ ...settings, displayWindow: message.value });
-            sendResponse({ ok: true });
-            break;
-          case "setExtensionId":
-            saveProjectTextSettings({ ...settings, extensionId: message.id });
-            sendResponse({ ok: true });
-            break;
-          case "setBackgroundMode": {
-            const mode = message.mode === "image" ? "image" : "color";
-            localStorage.setItem(backgroundMode, mode);
-            document.body.classList.toggle("background-image", mode === "image");
-            notifyOutputWindows({ action: "toggleBackground", mode });
-            sendResponse({ ok: true });
-            break;
-          }
-          case "setColor":
-            setPageBackgroundColor(message.color);
-            sendResponse({ ok: true });
-            break;
-          case "setOpacity":
-            setBackgroundImageOpacity(message.opacity);
             sendResponse({ ok: true });
             break;
           case "toggleSync":
@@ -327,59 +212,15 @@ function showOutputContextMenu(e) {
   showByCursor(menu, e);
 }
 
-async function toggleBackgroundMode(mode) {
-  if (mode) {
-    const currentMode = getBackgroundMode();
-    const newMode = currentMode === mode ? "color" : mode;
-    localStorage.setItem(backgroundMode, newMode);
-
-    // Update current page
-    document.body.classList.remove("background-image");
-    if (newMode === "image") {
-      document.body.classList.add("background-image");
-    }
-
-    // Notify output windows
-    notifyOutputWindows({ action: "toggleBackground", mode: newMode });
-  }
+function applyBackgroundColor(color) {
+  $(":root").style.setProperty("--pageBackgroundColor", color || "#000000");
 }
 
-function notifyOutputWindows(message) {
-  // Clean up closed windows
-  outputWindows = outputWindows.filter(win => win && !win.closed);
-
-  // Send message to all open output windows
-  outputWindows.forEach(win => {
-    try {
-      win.postMessage(message, window.location.origin);
-    } catch (error) {
-      console.debug("Failed to send message to output window:", error.message);
-    }
-  });
-}
-
+// Persist the color to chrome.storage.sync and apply it here. Other tabs/windows
+// (including the output window, on any origin) pick it up via chrome.storage.onChanged.
 function setPageBackgroundColor(color) {
-  localStorage.setItem(pageBackgroundColor, color);
-  const root = $(":root");
-  root.style.setProperty("--" + pageBackgroundColor, color);
-
-  // Notify output windows
-  notifyOutputWindows({ action: "updateColor", color });
-}
-
-function setBackgroundImageOpacity(opacity) {
-  opacity = parseInt(opacity) || 0;
-  if (opacity < 0) {
-    opacity = 0;
-  } else if (opacity > 100) {
-    opacity = 100;
-  }
-  localStorage.setItem(backgroundImgOpacity, opacity + "");
-  const root = $(":root");
-  root.style.setProperty("--" + backgroundImgOpacity, opacity / 100 + "");
-
-  // Notify output windows
-  notifyOutputWindows({ action: "updateOpacity", opacity });
+  setStoredSetting("pageBackgroundColor", color);
+  applyBackgroundColor(color);
 }
 
 function showContextMenu(e) {

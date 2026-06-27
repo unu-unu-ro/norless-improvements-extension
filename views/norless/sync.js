@@ -18,12 +18,12 @@ const SLIDE_ITEM = "#live_object_slides_wrapper .slides li[index]";
 const SLIDE_ITEMS = "#live_object_slides_wrapper .slides li";
 
 function isSyncEnabled() {
-  return localStorage.getItem(SYNC_ENABLED) === "true";
+  return getStoredSetting(SYNC_ENABLED, false) === true;
 }
 
 function toggleSync() {
   const enabled = !isSyncEnabled();
-  localStorage.setItem(SYNC_ENABLED, enabled + "");
+  setStoredSetting(SYNC_ENABLED, enabled);
   return enabled;
 }
 

@@ -63,19 +63,33 @@ function getDefaultProjectTextSettings() {
 }
 
 function getProjectTextSettings() {
-  const saved = localStorage.getItem("projectTextSettings");
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    return {
-      ...getDefaultProjectTextSettings(),
-      ...parsed
-    };
-  }
-  return getDefaultProjectTextSettings();
+  const defaults = getDefaultProjectTextSettings();
+  const useCustom = getStoredSetting("useCustomExtensionId", false);
+  const customId = getStoredSetting("bibleExtensionId", "");
+  return {
+    // shared across both apps: the fixed production id unless a custom id is enabled
+    extensionId: useCustom && customId ? customId : defaults.extensionId,
+    // per-origin, so RO and UA can each project to a different window
+    displayWindow: getStoredSetting(DISPLAY_WINDOW_KEY, defaults.displayWindow)
+  };
 }
 
+// Only the projection target window is per-origin; the extension id is managed
+// separately (shared) via setCustomBibleExtensionId / the popup checkbox.
 function saveProjectTextSettings(settings) {
-  localStorage.setItem("projectTextSettings", JSON.stringify(settings));
+  setStoredSetting(DISPLAY_WINDOW_KEY, settings.displayWindow);
+}
+
+// Set/clear the custom bible.com extension id (shared across both apps). Passing an empty
+// value just switches back to the production id WITHOUT discarding the stored custom id.
+function setCustomBibleExtensionId(id) {
+  const trimmed = (id || "").trim();
+  if (trimmed) {
+    setStoredSetting("bibleExtensionId", trimmed);
+    setStoredSetting("useCustomExtensionId", true);
+  } else {
+    setStoredSetting("useCustomExtensionId", false);
+  }
 }
 
 function getProjectIndexes(displayWindow) {
@@ -131,7 +145,7 @@ function onTextChanged(splitTitle, italicRefrainStyle) {
 // =======================
 // Exported function
 // =======================
-function initEventsOnTextChanged() {
+async function initEventsOnTextChanged() {
   if (window.location.pathname !== "/template/output.html") {
     return;
   }
@@ -139,6 +153,9 @@ function initEventsOnTextChanged() {
     console.info("Norless text change target not found");
     return;
   }
+
+  // Ensure projectTextSettings is loaded before the first projection.
+  await settingsReady;
 
   const splitTitle = window.location.hostname === "app-ua.norless.com";
   const italicRefrainStyle = !splitTitle;
