@@ -57,6 +57,42 @@ header {
   font-size: 14px;
 }
 
+/* Start / End buttons: same look as the favicons of the projected pages */
+.slides {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.slide-link {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 5px; /* 14/64 of the favicon */
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.slide-link.start {
+  background: #1f9d55;
+}
+
+.slide-link.end {
+  background: #d32f2f;
+}
+
+.slide-link:hover {
+  filter: brightness(1.15);
+}
+
 .dot {
   width: 8px;
   height: 8px;

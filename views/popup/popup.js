@@ -25,6 +25,13 @@ const DEFAULT_EXTENSION_ID = "fklnkmnlobkpoiifnbnemdpamheoanpj";
 // The extension this id targets (mirrors extensionName in bible-verses-integration.js).
 const TARGET_EXTENSION_NAME = "Project verses from bible.com";
 
+// Full-screen pages projected (via updateFrame) before / after the church service.
+// TODO: make them configurable from Settings.
+const SLIDE_PAGES = {
+  start: "https://info.unu-unu.ro/slides-open-close/start",
+  end: "https://info.unu-unu.ro/slides-open-close/end"
+};
+
 // Latest snapshot: { ro: state|null, ua: state|null, active: { key, tab } | null }
 let state = { ro: null, ua: null, active: null };
 
@@ -331,6 +338,33 @@ function render() {
 
 // ----- actions -----
 
+// Same resolution as getProjectTextSettings() in bible-verses-integration.js.
+function getBibleExtensionId() {
+  const settings = state.settings || {};
+  return settings.useCustomExtensionId && settings.bibleExtensionId ? settings.bibleExtensionId : DEFAULT_EXTENSION_ID;
+}
+
+// Show an external page full size in all open projection windows (see README of
+// [Project verses from bible.com] - External API - updateFrame).
+async function projectSlidePage(key) {
+  try {
+    const res = await chrome.runtime.sendMessage(getBibleExtensionId(), {
+      action: "updateFrame",
+      payload: { url: SLIDE_PAGES[key] }
+    });
+    if (res && res.status === 200) {
+      showToast(`Projecting ${key} page`);
+    } else if (res && res.error) {
+      showToast(res.error);
+    } else {
+      showToast("Open the projector window first");
+    }
+  } catch (error) {
+    console.debug("updateFrame failed:", error.message);
+    showToast(`${TARGET_EXTENSION_NAME} not available`);
+  }
+}
+
 function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
@@ -364,6 +398,10 @@ async function refresh() {
 function wireStaticControls() {
   document.querySelectorAll(".page-link").forEach(btn => {
     btn.addEventListener("click", () => openOrFocus(btn.dataset.page));
+  });
+
+  document.querySelectorAll(".slide-link").forEach(btn => {
+    btn.addEventListener("click", () => projectSlidePage(btn.dataset.slide));
   });
 
   document.querySelector("#saveBtn .ic").innerHTML = icons.lightSave;
