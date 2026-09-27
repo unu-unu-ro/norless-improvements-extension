@@ -15,11 +15,16 @@
   - [x] 🧩 Image
   - [x] ⬛ Opacity
 - [x] 📖 Project verses from bible.com (install: [here](https://chrome.google.com/webstore/detail/project-verses-from-biblecom/fklnkmnlobkpoiifnbnemdpamheoanpj))
+  - [x] while projecting to a bible.com window, the Norless `output.html` popup is replaced by a hidden iframe (fewer open windows) — only when the bible extension is installed & enabled (it opens its own projection windows); switch back to `Disable projection` to get the popup again
 - [x] 🇺🇦 Sync to app-ua — mirror selections from [app.norless.com](http://app.norless.com/) into [app-ua.norless.com](http://app-ua.norless.com/) when both are open (opt-in toggle, off by default)
   - [x] selecting a song selects the matching `RO / UA` song in app-ua
   - [x] clicking a slide projects the same slide (by index) in app-ua
   - [x] pressing `ESC` (stop projecting) is mirrored to app-ua
   - [x] toasts in app-ua when a song isn't found or has a different number of slides
+
+## 📈 Release Notes
+
+Check [release-notes.md](release-notes.md) changelog
 
 ## ⚙ Setup Plugin as Developer
 

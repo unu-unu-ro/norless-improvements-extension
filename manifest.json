@@ -1,6 +1,6 @@
 {
   "name": "Norless improvements",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Norless improvements for Projecting Church songs. Sync with [Project verses from bible.com] Extension ✨",
   "manifest_version": 3,
   "author": "Matei Nicolae",
@@ -30,41 +30,53 @@
         "views/common/actions.css",
         "views/common/toast/toast.css"
       ],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": true
     },
-
+    {
+      "matches": ["http://app.norless.com/*", "http://app-ua.norless.com/*"],
+      "exclude_matches": ["http://app.norless.com/template/output.html", "http://app-ua.norless.com/template/output.html"],
+      "js": ["views/norless/output-window-hook.js"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
     {
       "matches": ["http://app.norless.com/*"],
       "js": [
         "views/norless/storage.js",
         "views/norless/selectors.js",
         "views/norless/print.js",
+        "views/norless/runtime-messages.js",
         "views/norless/bible-verses-integration.js",
         "views/norless/index.js",
         "views/norless/sync.js"
-      ]
+      ],
+      "all_frames": true
     },
     {
       "matches": ["http://app.norless.com/template/output.html"],
       "css": ["views/norless/output-overrides.css"],
-      "js": ["views/norless/runtime-messages.js", "views/norless/bible-verses-integration.js"]
+      "js": ["views/norless/runtime-messages.js", "views/norless/bible-verses-integration.js"],
+      "all_frames": true
     },
-
     {
       "matches": ["http://app-ua.norless.com/*"],
       "js": [
         "views/norless/storage.js",
         "views/norless/selectors.js",
         "views/norless/print.js",
+        "views/norless/runtime-messages.js",
         "views/norless/bible-verses-integration.js",
         "views/norless/index.js",
         "views/norless/sync.js"
-      ]
+      ],
+      "all_frames": true
     },
     {
       "matches": ["http://app-ua.norless.com/template/output.html"],
       "css": ["views/norless/output-overrides.css"],
-      "js": ["views/norless/runtime-messages.js", "views/norless/bible-verses-integration.js"]
+      "js": ["views/norless/runtime-messages.js", "views/norless/bible-verses-integration.js"],
+      "all_frames": true
     }
   ],
   "icons": {

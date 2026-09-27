@@ -118,6 +118,7 @@ async function initEvents() {
     });
   } else {
     initPopupBridge();
+    initHiddenOutputFlag();
 
     const playlist = await waitElement("#playlist");
     playlist &&
@@ -133,6 +134,42 @@ async function initEvents() {
         false
       );
   }
+}
+
+// =======================
+// Hidden output window flag (read by output-window-hook.js in the MAIN world)
+// =======================
+// While projecting through the bible.com extension (displayWindow != 0) and that extension
+// answers, the Norless output popup is only a text source: the bible extension opens its own
+// projection windows on "updateText". So the hook renders output.html in an off-screen iframe
+// instead. If the bible extension is missing/disabled, the popup stays as usual.
+
+let bibleExtensionAvailable = false;
+
+function syncHiddenOutputFlag() {
+  const { displayWindow } = getProjectTextSettings();
+  const hidden = displayWindow !== 0 && bibleExtensionAvailable;
+  document.documentElement.dataset.norlessHiddenOutput = hidden ? "1" : "0";
+}
+
+async function checkBibleExtension() {
+  bibleExtensionAvailable = await isBibleExtensionAvailable(getProjectTextSettings().extensionId);
+  syncHiddenOutputFlag();
+}
+
+async function initHiddenOutputFlag() {
+  await settingsReady;
+  await checkBibleExtension();
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "sync") {
+      return;
+    }
+    if (changes.bibleExtensionId || changes.useCustomExtensionId) {
+      checkBibleExtension();
+    } else if (changes[DISPLAY_WINDOW_KEY]) {
+      syncHiddenOutputFlag();
+    }
+  });
 }
 
 // =======================

@@ -23,3 +23,21 @@ async function projectText(extensionId, text, markdown = false, index, nonBreaki
     return null;
   }
 }
+
+/**
+ * The bible extension answers "help" from its service worker, so this tells us whether it's
+ * installed & enabled (it then opens its projection windows by itself on "updateText").
+ * @param {String} extensionId
+ * @return {Promise<Boolean>}
+ */
+async function isBibleExtensionAvailable(extensionId) {
+  try {
+    const response = await chrome.runtime.sendMessage(extensionId, {
+      action: "help"
+    });
+    return response?.status === 200;
+  } catch (error) {
+    console.debug("Bible extension not available:", error.message);
+    return false;
+  }
+}
