@@ -7,6 +7,8 @@
  */
 async function projectText(extensionId, text, markdown = false, index, nonBreakingHyphens = false) {
   console.info("Sending text to Norless runtime: %o", index, { text, markdown });
+  // The text replaces any slide page projected from the toolbar popup → un-press it there.
+  chrome.storage.local.remove("activeSlideId");
 
   try {
     return await chrome.runtime.sendMessage(extensionId, {

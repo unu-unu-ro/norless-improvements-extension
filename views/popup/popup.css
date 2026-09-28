@@ -57,9 +57,10 @@ header {
   font-size: 14px;
 }
 
-/* Start / End buttons: same look as the favicons of the projected pages */
+/* Slide pages (live previews): 3 per row, wrapping */
 .slides {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
   margin-top: 10px;
   padding-top: 10px;
@@ -67,30 +68,139 @@ header {
 }
 
 .slide-link {
-  width: 22px;
-  height: 22px;
+  position: relative;
+  aspect-ratio: 16 / 9;
   padding: 0;
-  border: none;
-  border-radius: 5px; /* 14/64 of the favicon */
-  color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 22px;
-  text-align: center;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 5px;
   cursor: pointer;
 }
 
-.slide-link.start {
-  background: #1f9d55;
-}
-
-.slide-link.end {
-  background: #d32f2f;
-}
-
 .slide-link:hover {
+  border-color: var(--accent);
   filter: brightness(1.15);
+}
+
+/* Pressed = currently projected (click again to clear) */
+.slide-link.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Same .dot / @keyframes pulse as on the slide pages (info.unu-unu.ro) */
+.slide-link .dot {
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 1;
+  width: 6px; /* 10px on the page, but the preview is scaled down */
+  height: 6px;
+  border-radius: 50%;
+  background: #d9534f;
+  flex: none;
+  box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.6);
+  animation: pulse 2.4s infinite;
+}
+
+.slide-link.active .dot {
+  display: block;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 11px rgba(217, 83, 79, 0); /* 18px scaled like the dot (6/10) */
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(217, 83, 79, 0);
+  }
+}
+
+.slide-link .preview,
+.slide-link .placeholder {
+  position: absolute;
+  inset: 0;
+}
+
+.slide-link .placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  color: var(--muted);
+  font-size: 11px;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+/* Full size page, scaled down from the top-left corner (scale set in popup.js) */
+.slide-link iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  transform-origin: 0 0;
+  pointer-events: none; /* clicks go to the button */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.slide-link iframe.loaded {
+  opacity: 1;
+}
+
+.slide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slide-row,
+.slide-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slide-url {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.slide-row button,
+.slide-add button {
+  flex: none;
+  padding: 3px 7px;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.slide-row button:hover,
+.slide-add button:hover {
+  background: #3f4450;
+}
+
+.slide-row button.danger:hover {
+  background: var(--danger);
+}
+
+.field.stacked .slide-add input[type="text"] {
+  flex: 1;
+  width: auto;
 }
 
 .dot {

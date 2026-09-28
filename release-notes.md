@@ -10,6 +10,11 @@ Works together with [Project verses from bible.com](https://chromewebstore.googl
   - songs are still read from the Norless output (title, progress, key, next line, italic refrain, no chords) and sent to the bible.com projection windows, which the bible extension **opens automatically**
   - the **classic output popup** is used only when the bible.com extension is **not installed / disabled**, or when projection is set to `Disable projection` — eg. for rehearsals
   - switching live between the two modes (from the right-click menu or the toolbar popup) closes the popup / hidden output and **re-shows the current slide** in the right place
+- [x] 🖼️ **Configurable slide pages** in the toolbar popup (replace the fixed **S** / **E** buttons):
+  - add / remove any number of URLs from ⚙️ Settings → **Slides**
+  - each button shows a **live preview** of its page (scaled down), **3 per row**; click one to project that page full size
+  - the projected slide stays **pressed** (highlighted border + red dot); click it again to **clear the projection** (empty text, same as `Esc`) — it's released automatically when Norless projects a song
+  - URLs are saved in the extension's local storage
 
 ## 2.3.0 (2026-09-26)
 
