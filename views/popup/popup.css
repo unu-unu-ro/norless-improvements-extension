@@ -150,8 +150,24 @@ header {
   transition: opacity 0.3s ease;
 }
 
-.slide-link iframe.loaded {
+.slide-link .loaded iframe {
   opacity: 1;
+}
+
+/* Once loaded, the label becomes a caption (slide name) at the bottom, over the preview */
+.slide-link .loaded .placeholder {
+  top: auto;
+  z-index: 1;
+  display: block;
+  padding: 1px 4px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: normal;
 }
 
 .slide-list {

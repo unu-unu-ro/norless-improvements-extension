@@ -4,7 +4,7 @@ for [Chrome extension for Norless improvements](README.md) by [@Matei Nicolae](h
 
 Works together with [Project verses from bible.com](https://chromewebstore.google.com/detail/project-verses-from-bible/fklnkmnlobkpoiifnbnemdpamheoanpj) extension.
 
-## 2.4.0 (soon)
+## 2.4.0 (2026-09-30)
 
 - [x] 🪟 **No more Norless output window** while projecting through the bible.com extension: the `template/output.html` popup is replaced by a **hidden output** inside the Norless page, so there are fewer windows in the Dock / menu bar (one less for each open Norless page — `app.norless.com` and `app-ua.norless.com`)
   - songs are still read from the Norless output (title, progress, key, next line, italic refrain, no chords) and sent to the bible.com projection windows, which the bible extension **opens automatically**

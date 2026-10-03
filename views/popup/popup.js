@@ -371,7 +371,7 @@ function slideLabel(url) {
 }
 
 // Live preview: the page laid out at SLIDE_VIEWPORT, scaled down to the button's width.
-// The label stays behind it until the iframe has loaded (fades in).
+// The label is centered until the iframe has loaded (fades in), then moves to a caption at the bottom.
 function buildSlidePreview(page, width) {
   const preview = document.createElement("span");
   preview.className = "preview";
@@ -386,7 +386,7 @@ function buildSlidePreview(page, width) {
   frame.style.width = `${SLIDE_VIEWPORT.width}px`;
   frame.style.height = `${SLIDE_VIEWPORT.height}px`;
   frame.style.transform = `scale(${width / SLIDE_VIEWPORT.width})`;
-  frame.addEventListener("load", () => frame.classList.add("loaded"), { once: true });
+  frame.addEventListener("load", () => preview.classList.add("loaded"), { once: true });
   frame.src = page.url;
   preview.appendChild(frame);
 
