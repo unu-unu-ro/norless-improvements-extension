@@ -7,22 +7,16 @@
 // No chrome.* / DOM here (unit tested in projection.test.js).
 // Uses getTextToProject() and finalCharacter from views/norless/bible-verses-integration.js.
 
-// chrome.storage.sync: { 1: "ro", 2: "ru" } — the language each window shows, "" = disabled.
+// chrome.storage.sync: { 1: "ro", 2: "ru" } — the language each window shows; missing or "" = disabled.
 const NORLESS_WINDOW_LANGUAGES_KEY = "norlessWindowLanguages";
 // chrome.storage.local: the languages of the last message, offered in the popup.
 const NORLESS_SEEN_LANGUAGES_KEY = "norlessSeenLanguages";
 
-// The language a window shows: the stored choice ("" = disabled), else Romanian for
-// window 1 and Russian (else Ukrainian) for window 2.
+// The language a window shows: the one picked in the popup, "" (disabled) until then, so
+// a browser that never picked one (eg. planning at home) never opens the bible.com windows.
 function getWindowLanguage(index, stored, languages) {
   const chosen = stored && stored[index];
-  if (typeof chosen === "string") {
-    return chosen;
-  }
-  if (index === 1) {
-    return "ro";
-  }
-  return languages.includes("ru") ? "ru" : "uk";
+  return typeof chosen === "string" ? chosen : "";
 }
 
 function escapeHtml(text) {
