@@ -4,6 +4,15 @@ for [Chrome extension for Norless improvements](README.md) by [@Matei Nicolae](h
 
 Works together with [Project verses from bible.com](https://chromewebstore.google.com/detail/project-verses-from-bible/fklnkmnlobkpoiifnbnemdpamheoanpj) extension.
 
+## 2.5.0 (2026-10-31)
+
+- [x] 🎵 **New Norless** ([norless.com](https://norless.com/)) projected through the bible.com extension, without an output window: the extension says hello to the Norless page, which answers with what's live on every change (`norless:hello` / `norless:live`, plain text in every language)
+  - each bible.com window shows **its own language**: choose it in the toolbar popup → **norless.com** (`Window 1` Romanian, `Window 2` Russian (else Ukrainian) by default, or `Disabled`); one setting for norless.com, saved in Chrome sync storage
+  - songs look as before: progress, key, title, lines, next line, italic chorus, final mark 🌤 on the last part; a song without a version in a window's language blanks that window
+  - blank in Norless → empty text; a start / end page → shown full size (`updateFrame`) and removed when it leaves; a Bible reading → the window is left to bible.com (its verses)
+  - unchanged text isn't sent again; with several norless.com tabs open, only the tab **focused last** projects
+  - `app.norless.com` / `app-ua.norless.com` work as before
+
 ## 2.4.0 (2026-09-30)
 
 - [x] 🪟 **No more Norless output window** while projecting through the bible.com extension: the `template/output.html` popup is replaced by a **hidden output** inside the Norless page, so there are fewer windows in the Dock / menu bar (one less for each open Norless page — `app.norless.com` and `app-ua.norless.com`)
