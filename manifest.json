@@ -1,6 +1,6 @@
 {
   "name": "Norless improvements",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Norless improvements for Projecting Church songs. Sync with [Project verses from bible.com] Extension ✨",
   "manifest_version": 3,
   "author": "Matei Nicolae",
@@ -12,7 +12,7 @@
     "default_title": "Norless improvements"
   },
   "permissions": ["activeTab", "storage", "clipboardWrite"],
-  "host_permissions": ["http://app.norless.com/*", "http://app-ua.norless.com/*"],
+  "host_permissions": ["http://app.norless.com/*", "http://app-ua.norless.com/*", "https://norless.com/*"],
   "content_scripts": [
     {
       "matches": ["http://*.norless.com/*"],
@@ -77,6 +77,17 @@
       "css": ["views/norless/output-overrides.css"],
       "js": ["views/norless/runtime-messages.js", "views/norless/bible-verses-integration.js"],
       "all_frames": true
+    },
+    {
+      "matches": ["https://norless.com/*"],
+      "js": [
+        "views/common/utilities.js",
+        "views/norless/storage.js",
+        "views/norless/runtime-messages.js",
+        "views/norless/bible-verses-integration.js",
+        "views/norless-live/projection.js",
+        "views/norless-live/bridge.js"
+      ]
     }
   ],
   "icons": {
