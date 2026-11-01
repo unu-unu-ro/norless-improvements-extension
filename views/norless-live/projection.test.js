@@ -45,10 +45,10 @@ const shown = (text, frame = "") => ({ text, frame });
 const actions = result => result.messages.map(m => `${m.action}:${m.action === "updateFrame" ? m.payload.url || '""' : m.payload.text ? "text" : '""'}`);
 
 describe("getWindowLanguage", () => {
-  test("defaults: window 1 Romanian, window 2 Russian, else Ukrainian", () => {
-    expect(getWindowLanguage(1, {}, ["ro", "ru"])).toBe("ro");
-    expect(getWindowLanguage(2, {}, ["ro", "ru"])).toBe("ru");
-    expect(getWindowLanguage(2, undefined, ["ro", "uk"])).toBe("uk");
+  test("disabled until a language is picked", () => {
+    expect(getWindowLanguage(1, {}, ["ro", "ru"])).toBe("");
+    expect(getWindowLanguage(2, {}, ["ro", "ru"])).toBe("");
+    expect(getWindowLanguage(2, undefined, ["ro", "uk"])).toBe("");
   });
   test("the stored choice wins, '' disables", () => {
     expect(getWindowLanguage(1, { 1: "en" }, ["ro"])).toBe("en");
