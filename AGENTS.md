@@ -1,21 +1,15 @@
-# GitHub Copilot Instructions for Chrome Personal Improvements
+# Agent Instructions for Chrome Personal Improvements
 
-## AI Assistant Rules Sync
+## Agent Configuration
 
-This file is kept byte-identical with the Claude Code rules file:
+`AGENTS.md` is the single source of truth for AI assistant rules. The other files only point here:
 
-| File | Tool |
-|---|---|
-| `CLAUDE.md` | Claude Code |
-| `.github/copilot-instructions.md` | GitHub Copilot |
+| File | Tool | Contents |
+|---|---|---|
+| `CLAUDE.md` | Claude Code | `@AGENTS.md` |
+| `.github/copilot-instructions.md` | GitHub Copilot | one-line link to `AGENTS.md` |
 
-**When you update these rules, run the sync script after saving — the file you edited is the source of truth:**
-
-```bash
-bash .claude/sync-rules.sh <path-to-this-file>
-```
-
-> Claude Code: a `PostToolUse` hook in `.claude/settings.json` runs this automatically on every edit.
+When updating these rules, edit `AGENTS.md` — never add content to the pointer files.
 
 ## Project Overview
 
