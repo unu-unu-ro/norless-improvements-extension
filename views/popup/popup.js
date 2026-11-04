@@ -29,10 +29,7 @@ const TARGET_EXTENSION_NAME = "Project verses from bible.com";
 // Configurable from Settings; kept in chrome.storage.local as "slidePages": [{ id, url }].
 // Each button shows the page itself as a live preview: a full size iframe scaled down
 // (a screenshot isn't possible — captureVisibleTab only captures tabs, never this popup).
-const DEFAULT_SLIDE_URLS = [
-  "https://info.unu-unu.ro/slides-open-close/start",
-  "https://info.unu-unu.ro/slides-open-close/end"
-];
+const DEFAULT_SLIDE_URLS = ["https://info.unu-unu.ro/slides-open-close/start", "https://info.unu-unu.ro/slides-open-close/end"];
 
 // Id of the slide currently projected (chrome.storage.local "activeSlideId"), shown as
 // pressed. Cleared when it's toggled off, or when Norless projects text (runtime-messages.js).
@@ -604,12 +601,13 @@ function wireStaticControls() {
     btn.addEventListener("click", () => openOrFocus(btn.dataset.page));
   });
 
-
   document.querySelector("#saveBtn .ic").innerHTML = icons.lightSave;
   document.querySelector("#copyBtn .ic").innerHTML = icons.lightCopy;
   document.querySelector("#settings .chevron").innerHTML = icons.rightArrow;
   document.querySelector("#settingsIcon").innerHTML = icons.lightSettings;
-  document.querySelector("#projectIcon").innerHTML = icons.lightLiveChat;
+  document.querySelectorAll(".ic.project-icon").forEach(icon => {
+    icon.innerHTML = icons.lightLiveChat;
+  });
 
   document.getElementById("saveBtn").addEventListener("click", async () => {
     if (!state.active) return;
