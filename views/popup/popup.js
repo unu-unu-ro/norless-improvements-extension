@@ -29,7 +29,11 @@ const TARGET_EXTENSION_NAME = "Project verses from bible.com";
 // Configurable from Settings; kept in chrome.storage.local as "slidePages": [{ id, url }].
 // Each button shows the page itself as a live preview: a full size iframe scaled down
 // (a screenshot isn't possible — captureVisibleTab only captures tabs, never this popup).
-const DEFAULT_SLIDE_URLS = ["https://info.unu-unu.ro/slides-open-close/start", "https://info.unu-unu.ro/slides-open-close/end"];
+const DEFAULT_SLIDE_URLS = [
+  "https://info.unu-unu.ro/slides/start",
+  // + others..
+  "https://info.unu-unu.ro/slides/end"
+];
 
 // Id of the slide currently projected (chrome.storage.local "activeSlideId"), shown as
 // pressed. Cleared when it's toggled off, or when Norless projects text (runtime-messages.js).
@@ -376,6 +380,10 @@ function buildSlidePreview(page, width) {
   const placeholder = document.createElement("span");
   placeholder.className = "placeholder";
   placeholder.textContent = slideLabel(page.url);
+  const loading = document.createElement("span");
+  loading.className = "loading";
+  loading.textContent = "loading…";
+  placeholder.appendChild(loading);
   preview.appendChild(placeholder);
 
   const frame = document.createElement("iframe");
@@ -383,11 +391,21 @@ function buildSlidePreview(page, width) {
   frame.style.width = `${SLIDE_VIEWPORT.width}px`;
   frame.style.height = `${SLIDE_VIEWPORT.height}px`;
   frame.style.transform = `scale(${width / SLIDE_VIEWPORT.width})`;
-  frame.addEventListener("load", () => preview.classList.add("loaded"), { once: true });
-  frame.src = page.url;
   preview.appendChild(frame);
+  // Chrome shows the popup only after its "load" event, which waits for every iframe —
+  // so the remote pages start loading only once the popup is visible.
+  // (Listener added here: the src-less iframe already fires "load" for about:blank.)
+  afterPopupLoad(() => {
+    frame.addEventListener("load", () => preview.classList.add("loaded"), { once: true });
+    frame.src = page.url;
+  });
 
   return preview;
+}
+
+function afterPopupLoad(fn) {
+  if (document.readyState === "complete") setTimeout(fn);
+  else window.addEventListener("load", () => setTimeout(fn), { once: true });
 }
 
 function renderSlides() {
