@@ -1,9 +1,10 @@
 // =======================
 // norless.com → [Project verses from bible.com] windows
 // =======================
-// Says hello to the Norless page, which answers with a "norless:live" message at once and
-// on every change, and sends each projection window its language (toolbar popup →
-// norless.com). With several Norless tabs open, only the tab focused last projects.
+// Says hello to the Norless page, telling it the projection windows and their languages
+// (toolbar popup), again whenever they change; the page answers with a "norless:live"
+// message at once and on every change, and each window gets its language. With several
+// Norless tabs open, only the tab focused last projects.
 
 const NORLESS_ACTIVE_TAB_KEY = "norlessActiveTab"; // chrome.storage.local
 
@@ -108,6 +109,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "sync" && changes[NORLESS_WINDOW_LANGUAGES_KEY]) {
     windowLanguages = changes[NORLESS_WINDOW_LANGUAGES_KEY].newValue || {};
     reproject();
+    sayNorlessHello(); // Norless shows the windows' new languages
   }
 });
 
@@ -123,7 +125,9 @@ window.addEventListener("message", event => {
   queueProjection(lastLive);
 });
 
-// The app may still be loading: say hello every second until it answers.
-const sayNorlessHello = () => window.postMessage({ type: "norless:hello" }, location.origin);
+// The app may still be loading: say hello every second until it answers. The windows'
+// languages are read first, so Norless never shows them Disabled by mistake.
+const sayNorlessHello = () =>
+  norlessLiveReady.then(() => window.postMessage({ type: "norless:hello", windows: getHelloWindows(windowLanguages) }, location.origin));
 const norlessHello = setInterval(sayNorlessHello, 1000);
 sayNorlessHello();
