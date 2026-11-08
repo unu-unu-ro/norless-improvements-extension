@@ -24,28 +24,33 @@
     </header>
 
     <main>
-      <section id="windows">
-        <h2><span class="ic project-icon"></span><span>Project verses from bible.com</span></h2>
-        <div id="windowRows" class="window-rows"></div>
-        <p id="conflictNote" class="note hidden">⚠️ A window is claimed by both pages. Re-assign it to fix.</p>
-      </section>
-
       <section id="norlessLive">
         <h2>
-          <span class="ic project-icon"></span><span>Project norless.com via bible.com <span class="muted">— language per window</span></span>
+          <span class="ic project-icon"></span><span>Project verses from bible.com <span class="muted">— norless.com language per window</span></span>
         </h2>
         <div id="norlessLiveRows" class="window-rows"></div>
       </section>
 
-      <div id="syncRow" class="sync-row"></div>
+      <!-- The old apps' part, shown only while app.norless.com or app-ua.norless.com is open. -->
+      <div id="oldNorless" class="hidden">
+        <section id="windows">
+          <h2>
+            <span class="ic project-icon"></span><span>Old Norless <span class="muted">— app.norless.com window</span></span>
+          </h2>
+          <div id="windowRows" class="window-rows"></div>
+          <p id="conflictNote" class="note hidden">⚠️ A window is claimed by both pages. Re-assign it to fix.</p>
+        </section>
 
-      <section id="playlist">
-        <h2>📃 Playlist <span id="activeLabel" class="muted"></span></h2>
-        <div class="btns">
-          <button id="saveBtn" type="button"><span class="ic"></span><span>Save as HTML</span></button>
-          <button id="copyBtn" type="button"><span class="ic"></span><span>Copy</span></button>
-        </div>
-      </section>
+        <div id="syncRow" class="sync-row"></div>
+
+        <section id="playlist">
+          <h2>📃 Playlist <span id="activeLabel" class="muted"></span></h2>
+          <div class="btns">
+            <button id="saveBtn" type="button"><span class="ic"></span><span>Save as HTML</span></button>
+            <button id="copyBtn" type="button"><span class="ic"></span><span>Copy</span></button>
+          </div>
+        </section>
+      </div>
 
       <details id="settings">
         <summary>

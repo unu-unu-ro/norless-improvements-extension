@@ -4,6 +4,11 @@ for [Chrome extension for Norless improvements](README.md) by [@Matei Nicolae](h
 
 Works together with [Project verses from bible.com](https://chromewebstore.google.com/detail/project-verses-from-bible/fklnkmnlobkpoiifnbnemdpamheoanpj) extension.
 
+## 2.6.0 (2026-11-08)
+
+- [x] 🪟 **Norless sees the bible.com windows**: the hello to norless.com says which windows there are and the language each shows (`windows: [{ name: "Window 1", language: "ro" }, { name: "Window 2", language: null }]`, null while `Disabled`), and says it again when a language changes in the popup; Norless shows each window as a projector in the laptop's screens menu, with a preview of what it shows
+- [x] 🧭 **Popup: norless.com first**: "Project verses from bible.com" now holds the norless.com language per window; the old apps' window buttons, sync and playlist move under **Old Norless**, shown only while `app.norless.com` or `app-ua.norless.com` is open (they did nothing otherwise, and their greyed-out buttons read as broken)
+
 ## 2.5.0 (2026-10-31)
 
 - [x] 🎵 **New Norless** ([norless.com](https://norless.com/)) projected through the bible.com extension, without an output window: the extension says hello to the Norless page, which answers with what's live on every change (`norless:hello` / `norless:live`, plain text in every language)
