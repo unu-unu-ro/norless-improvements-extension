@@ -532,6 +532,8 @@ function renderSlideList() {
 }
 
 function render() {
+  // The old apps' window buttons, sync and playlist only work while one of them is open.
+  document.getElementById("oldNorless").classList.toggle("hidden", !(state.ro || state.ua));
   renderPages();
   renderSlides();
   renderWindows();

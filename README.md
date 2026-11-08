@@ -17,7 +17,8 @@
 - [x] 📖 Project verses from bible.com (install: [here](https://chrome.google.com/webstore/detail/project-verses-from-biblecom/fklnkmnlobkpoiifnbnemdpamheoanpj))
   - [x] while projecting to a bible.com window, the Norless `output.html` popup is replaced by a hidden iframe (fewer open windows) — only when the bible extension is installed & enabled (it opens its own projection windows); switch back to `Disable projection` to get the popup again
 - [x] 🎵 New [norless.com](https://norless.com/): what's live (songs, text slides, start / end pages) is projected in the bible.com windows, each window in its own language
-  - [x] toolbar popup → **norless.com**: a language for `Window 1` and `Window 2` (eg. Romanian and Russian), or `Disabled`; both start `Disabled`, so nothing is projected until a language is picked
+  - [x] toolbar popup → **Project verses from bible.com**: a language for `Window 1` and `Window 2` (eg. Romanian and Russian), or `Disabled`; both start `Disabled`, so nothing is projected until a language is picked
+  - [x] Norless shows each window as a projector in its screens menu, with its language and a preview (the hello tells it the windows)
   - [x] a page up before / after the service is shown full size (`updateFrame`); a Bible reading leaves the window to bible.com
   - [x] with several norless.com tabs open, the tab focused last projects
 - [x] 🇺🇦 Sync to app-ua — mirror selections from [app.norless.com](http://app.norless.com/) into [app-ua.norless.com](http://app-ua.norless.com/) when both are open (opt-in toggle, off by default)
