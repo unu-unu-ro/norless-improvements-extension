@@ -19,6 +19,15 @@ function getWindowLanguage(index, stored, languages) {
   return typeof chosen === "string" ? chosen : "";
 }
 
+// The bible.com windows as the hello tells them to Norless, which shows each as a projector
+// with its language (null: Disabled). Norless manual: "Messages for extensions".
+function getHelloWindows(stored) {
+  return [1, 2].map(index => ({
+    name: `Window ${index}`,
+    language: getWindowLanguage(index, stored) || null
+  }));
+}
+
 function escapeHtml(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }

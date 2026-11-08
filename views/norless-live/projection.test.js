@@ -7,7 +7,7 @@ const context = vm.createContext({ $: () => null });
 ["../norless/bible-verses-integration.js", "projection.js"].forEach(file => {
   vm.runInContext(fs.readFileSync(path.join(__dirname, file), "utf8"), context);
 });
-const { getWindowLanguage, getWindowMessages, getUnknownWindowState } = context;
+const { getWindowLanguage, getWindowMessages, getUnknownWindowState, getHelloWindows } = context;
 const finalCharacter = vm.runInContext("finalCharacter", context);
 
 const chorus = {
@@ -53,6 +53,20 @@ describe("getWindowLanguage", () => {
   test("the stored choice wins, '' disables", () => {
     expect(getWindowLanguage(1, { 1: "en" }, ["ro"])).toBe("en");
     expect(getWindowLanguage(2, { 2: "" }, ["ru"])).toBe("");
+  });
+});
+
+describe("getHelloWindows", () => {
+  test("both windows, each with its language, null while Disabled", () => {
+    // Plain JSON, since the vm context has its own Array prototype.
+    expect(JSON.parse(JSON.stringify(getHelloWindows({ 1: "ro", 2: "" })))).toEqual([
+      { name: "Window 1", language: "ro" },
+      { name: "Window 2", language: null }
+    ]);
+    expect(JSON.parse(JSON.stringify(getHelloWindows(undefined)))).toEqual([
+      { name: "Window 1", language: null },
+      { name: "Window 2", language: null }
+    ]);
   });
 });
 
