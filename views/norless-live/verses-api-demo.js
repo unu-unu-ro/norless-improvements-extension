@@ -1,7 +1,8 @@
 // =======================
 // Demo: [Project verses from bible.com] External API — getVerses / projectVerses
 // =======================
-// Runs automatically on norless.com and logs the answers in the console (temporary, for testing).
+// Example, not loaded by the manifest: to try it, add it after settings.js in the norless.com
+// content script. It runs on norless.com and logs the answers in the console.
 //   - after 10s: getVerses     → the text of a reference, nothing is projected
 //   - after 20s: projectVerses → bible.com opens the chapter and projects the verses
 //   - after 25s: an invalid reference → status 422, nothing is projected
@@ -10,7 +11,7 @@
 
 async function sendVersesRequest(action, payload) {
   await settingsReady;
-  const { extensionId } = getProjectTextSettings();
+  const extensionId = getBibleExtensionId();
   try {
     return await chrome.runtime.sendMessage(extensionId, { action, payload });
   } catch (error) {

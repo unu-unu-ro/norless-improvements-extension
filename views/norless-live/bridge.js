@@ -46,7 +46,7 @@ async function projectLive(live) {
     chrome.storage.local.set({ [NORLESS_SEEN_LANGUAGES_KEY]: languages });
   }
 
-  const { extensionId } = getProjectTextSettings();
+  const extensionId = getBibleExtensionId();
   await Promise.all(
     [1, 2].map(async index => {
       const language = getWindowLanguage(index, windowLanguages, languages);
@@ -57,10 +57,10 @@ async function projectLive(live) {
       shownByWindow[index] = shown;
       for (const { action, payload } of messages) {
         if (action === "updateText") {
-          await projectText(extensionId, payload.text, payload.markdown, index);
-        } else {
-          await sendToBibleWindow(extensionId, action, { ...payload, index });
+          // The text replaces any slide page projected from the toolbar popup → un-press it there.
+          chrome.storage.local.remove("activeSlideId");
         }
+        await sendToBibleWindow(extensionId, action, { ...payload, index });
       }
     })
   );

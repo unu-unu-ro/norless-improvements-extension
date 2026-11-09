@@ -1,12 +1,10 @@
-// Loads the content scripts as Chrome does (classic scripts sharing one global scope).
+// Loads projection.js as Chrome does (a classic script, its functions global).
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-const context = vm.createContext({ $: () => null });
-["../norless/bible-verses-integration.js", "projection.js"].forEach(file => {
-  vm.runInContext(fs.readFileSync(path.join(__dirname, file), "utf8"), context);
-});
+const context = vm.createContext({});
+vm.runInContext(fs.readFileSync(path.join(__dirname, "projection.js"), "utf8"), context);
 const { getWindowLanguage, getWindowMessages, getUnknownWindowState, getHelloWindows } = context;
 const finalCharacter = vm.runInContext("finalCharacter", context);
 

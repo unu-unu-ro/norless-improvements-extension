@@ -5,7 +5,28 @@
 // with what's live, as plain text in every language (Norless manual: "Messages for
 // extensions"). This file maps one message to the messages for one projection window.
 // No chrome.* / DOM here (unit tested in projection.test.js).
-// Uses getTextToProject() and finalCharacter from views/norless/bible-verses-integration.js.
+
+// The mark after the last part of a song.
+const finalCharacter = '<span class="final" style="position: relative;top: -0.5em;font-size: 80%;font-style: normal;">🌤</span>';
+
+// The HTML projected for a song part: progress, key, title, lines and the next line.
+function getTextToProject({ progress, key, title, refrain, paragraphs, nextLine } = {}) {
+  // leave some space at bottom if next line exists (1.2em should be enough for one line)
+  const nextLineStyle = "opacity: 0.5; position: fixed; bottom: 10px; font-size: 0.7em;";
+  const refrainStyle = refrain ? "font-style: italic;" : "";
+
+  return `
+    <h1 class="reference" style="font-variant-caps: normal; letter-spacing: normal;">
+      ${progress ? `<span class="version" style="font-size: 0.8em; letter-spacing: 0.2rem;">${progress}</span>` : ""}
+      ${key ? `<span class="version" style="font-size: 0.8em; opacity: 1;">${key}</span>` : ""}
+      <span style="opacity: 0.6">${title}</span>
+    </h1>
+    <div class="singlelines bold" style="${nextLine ? "padding: 0 0 1.2em 0;" : ""}; ${refrainStyle}">
+      ${paragraphs.map(line => `<p><strong>${line}</strong></p>`).join("")}
+    </div>
+    ${nextLine ? `<div class="singlelines nextline" style="${nextLineStyle}"><p><strong>${nextLine}</strong></p></div>` : ""}
+  `;
+}
 
 // chrome.storage.sync: { 1: "ro", 2: "ru" } — the language each window shows; missing or "" = disabled.
 const NORLESS_WINDOW_LANGUAGES_KEY = "norlessWindowLanguages";
@@ -32,7 +53,7 @@ function escapeHtml(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// The HTML for one language, like the old app's output: progress, key, title, lines,
+// The HTML for one language, as projected: progress, key, title, lines,
 // next line, italic chorus and the final mark on the last part. "" when the message has
 // no text in that language (eg. a song without a version in it).
 function getLiveText(live, language) {

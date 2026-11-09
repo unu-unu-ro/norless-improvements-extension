@@ -1,6 +1,6 @@
 {
   "name": "norless-improvements",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "Norless improvements for Projecting Church songs. Sync with [Project verses from bible.com] Extension ✨",
   "main": "index.js",
   "scripts": {
@@ -19,10 +19,7 @@
   "homepage": "https://github.com/unu-unu-ro/norless-improvements-extension#readme",
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/views/common/utilities.js"
-    ]
+    "testEnvironment": "node"
   },
   "dependencies": {},
   "devDependencies": {

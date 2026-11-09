@@ -4,6 +4,11 @@ for [Chrome extension for Norless improvements](README.md) by [@Matei Nicolae](h
 
 Works together with [Project verses from bible.com](https://chromewebstore.google.com/detail/project-verses-from-bible/fklnkmnlobkpoiifnbnemdpamheoanpj) extension.
 
+## 2.7.0 (2026-11-09)
+
+- [x] 🧹 **Old Norless apps removed**: `app.norless.com` and `app-ua.norless.com` are deprecated, so everything for them is gone (right-click menu, playlist save / copy, background, hidden output window, sync to app-ua, closing the output window); only [norless.com](https://norless.com/) is supported
+- [x] 🔗 **Popup**: one **norless.com** button at the top (focuses the open tab, or opens one) instead of the two old apps; the section is named **Project norless.com via bible.com — language per window**; ⚙️ Settings no longer has **Background**
+
 ## 2.6.0 (2026-11-08)
 
 - [x] 🪟 **Norless sees the bible.com windows**: the hello to norless.com says which windows there are and the language each shows (`windows: [{ name: "Window 1", language: "ro" }, { name: "Window 2", language: null }]`, null while `Disabled`), and says it again when a language changes in the popup; Norless shows each window as a projector in the laptop's screens menu, with a preview of what it shows

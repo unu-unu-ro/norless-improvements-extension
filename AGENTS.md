@@ -1,4 +1,4 @@
-# Agent Instructions for Chrome Personal Improvements
+# Agent Instructions for Norless improvements
 
 ## Agent Configuration
 
@@ -13,7 +13,11 @@ When updating these rules, edit `AGENTS.md` — never add content to the pointer
 
 ## Project Overview
 
-This is a Chrome extension (Manifest V3) that provides personalized enhancements and improved user experience for specific websites. The extension uses pure JavaScript and CSS without complex frameworks.
+A Chrome extension (Manifest V3) that projects [norless.com](https://norless.com/) in the windows of the
+[Project verses from bible.com] extension, each window in its own language, plus a toolbar popup
+(norless.com link, slide pages, settings). Pure JavaScript and CSS, no frameworks.
+
+The old apps `app.norless.com` / `app-ua.norless.com` are deprecated and no longer supported.
 
 ## Core Architecture
 
@@ -22,108 +26,52 @@ This is a Chrome extension (Manifest V3) that provides personalized enhancements
 - **Pure JavaScript (ES6+)** - No frameworks (React, Vue, Angular, etc.)
 - **Vanilla CSS** - No preprocessors or CSS-in-JS
 - **Chrome Extension APIs** - Manifest V3
-- **Content Scripts** - Injected into target websites
-- **Service Worker** - Background operations
+- **Content Scripts** - Injected into norless.com (classic scripts sharing one global scope)
+- **No service worker** - the popup and content scripts message the bible.com extension directly
 
 ### Project Structure
 
 ```
 views/
-  ├── background.js           # Service worker
-  ├── common/                 # Shared utilities and components
-  │   ├── utilities.js        # Helper functions ($, $$, waitElement, etc.)
-  │   ├── colors.css          # Shared color variables
-  │   ├── simplePrompt/       # Custom prompt dialogs
-  │   ├── toast/             # Toast notifications (showToast)
-  │   └── tooltip/            # Context menu system
-  ├── [website-domain]/       # Website-specific enhancements
-  │   ├── index.js           # Site-specific functionality
-  │   └── overrides.css      # Site-specific styles
+  ├── icons/                  # Extension icons + icons.js (inline SVGs for the popup)
+  ├── norless-live/           # norless.com → bible.com windows (content scripts)
+  │   ├── settings.js         # bible.com extension id (chrome.storage.sync), getBibleExtensionId()
+  │   ├── projection.js       # Pure: "norless:live" message → messages for one window (unit tested)
+  │   ├── projection.test.js  # Jest tests for projection.js
+  │   ├── bridge.js           # norless:hello / norless:live, sends to the bible.com windows
+  │   └── verses-api-demo.js  # Example of getVerses / projectVerses (not loaded by the manifest)
+  └── popup/                  # Toolbar popup
+      ├── popup.html / popup.css
+      ├── popup.js            # norless.com link, slide pages, settings
+      └── norless-live.js     # Language per bible.com window
 ```
 
 ## Code Style & Patterns
 
 ### JavaScript Conventions
 
-1. **DOM Selection**
-
-   - Use `$(selector)` for single element selection (querySelector wrapper)
-   - Use `$$(selector)` for multiple elements (querySelectorAll wrapper, returns array)
-   - Use `waitElement(selector, timeout)` for async element waiting
-
-2. **Function Style**
-
+1. **Function Style**
    - Prefer `async/await` over promise chains
    - Use arrow functions for callbacks
    - Function declarations for main functions
 
-3. **Naming Conventions**
-
+2. **Naming Conventions**
    - camelCase for variables and functions
    - Descriptive names that indicate purpose
-   - Prefix async functions with async operations context
 
-4. **Storage**
-   - Use `localStorage` for persistent settings
-   - Store objects as JSON strings with `JSON.stringify/parse`
-   - Settings functions follow pattern: `get[Setting]()` and `set[Setting](value)`
+3. **Storage**
+   - Settings that roam across devices: `chrome.storage.sync` (eg. `norlessWindowLanguages`, `bibleExtensionId`)
+   - Per-browser state: `chrome.storage.local` (eg. `slidePages`, `activeSlideId`, `norlessActiveTab`)
+   - Content scripts and the popup share state through `chrome.storage.onChanged`
 
-### Common Utility Functions
-
-Always use these existing utilities from `views/common/utilities.js`:
-
-- `$(selector, parent)` - Query single element
-- `$$(selector, parent)` - Query multiple elements (returns array)
-- `sleep(ms)` - Promise-based delay
-- `waitElement(selector, timeout)` - Wait for element to appear
-- `debounce(fn, delay)` - Debounce function calls
-- `copyToClipboard(text)` - Copy text to clipboard
-- `showToast(message, type, duration)` - Transient toast notification (from `views/common/toast/toast.js`)
-
-### Context Menu Pattern
-
-For right-click context menus, use this pattern:
-
-```javascript
-document.body.addEventListener("contextmenu", e => {
-  const target = e.target.closest(".target-selector");
-  if (target) {
-    e.stopPropagation();
-    e.preventDefault();
-
-    const menu = getContextMenu([
-      {
-        text: "Menu Item",
-        icon: "🔲",
-        itemId: "uniqueId",
-        handler: () => {
-          // Action code
-        }
-      }
-    ]);
-    showByCursor(menu, e);
-  }
-});
-```
-
-### Custom Prompt Pattern
-
-For user input dialogs, use:
-
-```javascript
-const answer = await simplePrompt("Enter value:", defaultValue, "placeholder");
-const confirmed = await simpleConfirm("Confirm action?", {
-  cancel: "Cancel",
-  ok: "OK",
-  focus: "no"
-});
-```
+4. **Pure logic stays testable**
+   - Keep chrome.* / DOM out of `projection.js`; the test loads it with `vm` like Chrome does
 
 ## Chrome Extension Integration
 
 ### Inter-Extension Communication
 
-When communicating with other Chrome extensions:
+When communicating with the bible.com extension:
 
 ```javascript
 try {
@@ -137,151 +85,46 @@ try {
 }
 ```
 
-### Cross-Origin / Cross-Tab Communication
+### Page ↔ content script
 
-`window.postMessage` and `BroadcastChannel` only work same-origin, so to bridge tabs on
-**different** origins (e.g. `app.norless.com` → `app-ua.norless.com`) use `chrome.storage`
-as a message bus. `chrome.storage.onChanged` fires in the content scripts of every tab,
-including the other origin, and needs only the already-granted `storage` permission (no
-service-worker relay).
-
-```javascript
-// Sender (writes a command; include a unique id so identical repeats still fire onChanged)
-chrome.storage.local.set({ commandKey: { id: Date.now() + "-" + counter++, action, payload } });
-
-// Receiver (in the other tab)
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName !== "local" || !changes.commandKey) return;
-  handleCommand(changes.commandKey.newValue);
-});
-```
-
-See `views/norless/sync.js` for the RO → UA selection-sync implementation.
-
-### Content Script Structure
-
-Each website enhancement follows this pattern:
-
-1. Wait for page load (`document_end` in manifest)
-2. Add event listeners for context menus
-3. Use utility functions for DOM manipulation
-4. Store preferences in localStorage
-5. Apply stored preferences on load
+norless.com and `bridge.js` talk with `window.postMessage` on the page's own window
+(`norless:hello` from the extension, `norless:live` from Norless — Norless manual: "Messages for extensions").
+Always check `event.source === window` and `event.origin === location.origin`.
 
 ### Manifest Configuration
 
 - Use Manifest V3 syntax
-- Content scripts are organized by website domain
-- Common utilities loaded first, then site-specific scripts
-- Permissions: minimal required set (activeTab, storage, clipboardWrite)
-
-## Site-Specific Features
-
-### Feature Implementation Pattern
-
-When adding features for a website:
-
-1. Create folder: `views/[domain-name]/`
-2. Add `index.js` for functionality
-3. Add `overrides.css` for styling
-4. Update `manifest.json` content_scripts section
-5. Use context menu for feature toggles
-
-### Local Storage Settings
-
-Pattern for managing settings:
-
-```javascript
-function getSettingName() {
-  const saved = localStorage.getItem("settingKey");
-  return saved ? JSON.parse(saved) : defaultValue;
-}
-
-function saveSettingName(value) {
-  localStorage.setItem("settingKey", JSON.stringify(value));
-}
-```
+- One content script entry for `https://norless.com/*`: `settings.js`, `projection.js`, `bridge.js` (in this order)
+- Permissions: minimal required set
 
 ## CSS Guidelines
 
-1. **Scoping** - Use specific selectors to avoid conflicts with host site
-2. **Variables** - Define common colors in `views/common/colors.css`
-3. **Naming** - Use kebab-case for class names
-4. **Layout** - Prefer flexbox/grid for layouts
-5. **Overrides** - Be specific to override site styles without `!important` when possible
-
-## Common Patterns to Follow
-
-### Event Delegation
-
-```javascript
-document.body.addEventListener("contextmenu", e => {
-  const target = e.target.closest(".selector");
-  if (target) {
-    // Handle event
-  }
-});
-```
-
-### Async Operations
-
-```javascript
-async function enhanceFeature() {
-  const element = await waitElement(".target", 5000);
-  if (element) {
-    // Enhance feature
-  }
-}
-```
-
-### Toggle Features
-
-```javascript
-const toggle = className => {
-  const isActive = document.body.classList.toggle(className);
-  localStorage.setItem("featureState", isActive ? className : "");
-};
-```
+1. **Variables** - Popup colors are tokens on `:root` in `popup.css`
+2. **Naming** - Use kebab-case for class names
+3. **Layout** - Prefer flexbox/grid for layouts
 
 ## Testing & Debugging
 
-- Use `console.info()` for feature actions
-- Use `console.debug()` for detailed logs
-- Test in Chrome with developer mode
-- Verify localStorage changes in DevTools
+- `npm test` runs Jest (`projection.test.js`)
+- Use `console.info()` for feature actions, `console.debug()` for detailed logs
+- Test in Chrome with developer mode (Load unpacked)
 - Check content script injection in DevTools > Sources
 
 ## Important Rules
 
 1. **No Frameworks** - Keep the codebase vanilla JS/CSS
 2. **Minimal Dependencies** - Avoid external libraries
-3. **Performance** - Wait for elements rather than polling
-4. **Graceful Degradation** - Features should fail silently if elements missing
-5. **User Control** - Provide context menu toggles for features
-6. **Clean Code** - Reuse common utilities, avoid duplication
-7. **Chrome APIs** - Use modern Manifest V3 APIs
-8. **Cross-Extension** - Handle inter-extension messaging failures gracefully
-
-## When Adding New Website Support
-
-1. Identify the website domain
-2. Create `views/[domain]/` folder
-3. Add index.js with site-specific enhancements
-4. Add overrides.css for styling changes
-5. Update manifest.json with new content_scripts entry
-6. Use common utilities from `views/common/`
-7. Follow existing context menu patterns
-8. Document feature in README.md
+3. **Graceful Degradation** - Features should fail silently if the bible.com extension or elements are missing
+4. **Chrome APIs** - Use modern Manifest V3 APIs
+5. **Cross-Extension** - Handle inter-extension messaging failures gracefully
+6. **Docs** - Document features in README.md and changes in release-notes.md
 
 ## Code Review Checklist
 
-- [ ] Uses existing utility functions
 - [ ] Follows naming conventions
 - [ ] No external dependencies added
 - [ ] Uses async/await properly
 - [ ] Handles errors gracefully
-- [ ] localStorage used for persistence
-- [ ] Context menu follows established pattern
-- [ ] CSS is scoped appropriately
+- [ ] Pure logic kept in projection.js and covered by tests
 - [ ] manifest.json updated correctly
 - [ ] Works with Chrome Manifest V3

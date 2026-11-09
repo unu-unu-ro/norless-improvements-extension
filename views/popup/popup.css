@@ -10,8 +10,6 @@
   --muted: #9aa0ad;
   --border: #3c414c;
   --accent: #0798ab;
-  --ro: #2b6cb0;
-  --ua: #d4a017;
   --danger: #c0392b;
 }
 
@@ -51,10 +49,6 @@ header {
 
 .page-link:hover {
   background: var(--panel-2);
-}
-
-.page-link .flag {
-  font-size: 14px;
 }
 
 /* Slide pages (live previews): 3 per row, wrapping */
@@ -296,53 +290,6 @@ h2 {
   color: var(--muted);
 }
 
-.seg {
-  display: flex;
-  flex: 1;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.seg button {
-  flex: 1;
-  padding: 6px 4px;
-  background: var(--panel-2);
-  color: var(--text);
-  border: none;
-  border-left: 1px solid var(--border);
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.seg button:first-child {
-  border-left: none;
-}
-
-.seg button:hover:not(:disabled) {
-  background: #3f4450;
-}
-
-.seg button.active {
-  background: var(--accent);
-  color: #fff;
-  font-weight: 600;
-}
-
-.seg button.active[data-val="ro"] {
-  background: var(--ro);
-}
-
-.seg button.active[data-val="ua"] {
-  background: var(--ua);
-  color: #1f2127;
-}
-
-.seg button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
 .window-row select {
   flex: 1;
   min-width: 0;
@@ -354,33 +301,6 @@ h2 {
   font-size: 12px;
 }
 
-.sync-row {
-  display: flex;
-}
-
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 7px 9px;
-  background: var(--panel);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  text-align: left;
-}
-
-.toggle:hover {
-  background: var(--panel-2);
-}
-
-.toggle .ic {
-  flex: none;
-}
-
 .ic {
   display: inline-flex;
   align-items: center;
@@ -389,40 +309,6 @@ h2 {
 .ic svg {
   width: 18px;
   height: 18px;
-}
-
-.btns {
-  display: flex;
-  gap: 8px;
-}
-
-.btns button {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px;
-  background: var(--panel);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.btns button:hover:not(:disabled) {
-  background: var(--panel-2);
-}
-
-.btns button:disabled {
-  background: var(--panel-2);
-  color: var(--muted);
-  cursor: not-allowed;
-}
-
-.btns button:disabled .ic svg {
-  opacity: 0.4;
 }
 
 details#settings {
@@ -501,16 +387,6 @@ details#settings[open] summary .chevron {
   font-size: 12px;
 }
 
-.field input[type="color"] {
-  width: 34px;
-  height: 26px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  background: var(--panel-2);
-  cursor: pointer;
-}
-
 .field.stacked {
   flex-direction: column;
   align-items: stretch;
@@ -557,30 +433,6 @@ details#settings[open] summary .chevron {
 .field input[readonly] {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.radios {
-  display: flex;
-  gap: 12px;
-}
-
-.radios label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-}
-
-.note {
-  margin: 8px 0 0;
-  font-size: 11px;
-  color: #e0b341;
-}
-
-.closed-note {
-  color: var(--muted);
-  font-size: 11px;
-  font-style: italic;
 }
 
 .hidden {
