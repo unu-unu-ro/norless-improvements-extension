@@ -13,7 +13,7 @@
   "content_scripts": [
     {
       "matches": ["https://norless.com/*"],
-      "js": ["views/norless-live/settings.js", "views/norless-live/projection.js", "views/norless-live/bridge.js"]
+      "js": ["views/common/utilities.js", "views/norless-live/settings.js", "views/norless-live/projection.js", "views/norless-live/bridge.js"]
     }
   ],
   "icons": {

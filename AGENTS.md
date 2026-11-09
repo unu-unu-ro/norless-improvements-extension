@@ -33,6 +33,8 @@ The old apps `app.norless.com` / `app-ua.norless.com` are deprecated and no long
 
 ```
 views/
+  ├── common/
+  │   └── utilities.js        # Shared helpers ($, $$, waitElement, ...) — kept for future use
   ├── icons/                  # Extension icons + icons.js (inline SVGs for the popup)
   ├── norless-live/           # norless.com → bible.com windows (content scripts)
   │   ├── settings.js         # bible.com extension id (chrome.storage.sync), getBibleExtensionId()
@@ -67,6 +69,20 @@ views/
 4. **Pure logic stays testable**
    - Keep chrome.* / DOM out of `projection.js`; the test loads it with `vm` like Chrome does
 
+### Common Utility Functions
+
+`views/common/utilities.js` is kept on purpose, to be used by future features (don't delete it because
+nothing uses it yet). It's loaded first in the norless.com content script, so its helpers are global
+there. Reuse them instead of writing new ones:
+
+- `$(selector, parent)` - Query single element
+- `$$(selector, parent)` - Query multiple elements (returns array)
+- `sleep(ms)` - Promise-based delay
+- `waitElement(selector, timeout)` - Wait for element to appear
+- `debounce(fn, delay)` - Debounce function calls
+- `copyToClipboard(text)` - Copy text to clipboard
+- `download(text, name, type)` - Save text as a file
+
 ## Chrome Extension Integration
 
 ### Inter-Extension Communication
@@ -94,7 +110,7 @@ Always check `event.source === window` and `event.origin === location.origin`.
 ### Manifest Configuration
 
 - Use Manifest V3 syntax
-- One content script entry for `https://norless.com/*`: `settings.js`, `projection.js`, `bridge.js` (in this order)
+- One content script entry for `https://norless.com/*`: `common/utilities.js`, `settings.js`, `projection.js`, `bridge.js` (in this order)
 - Permissions: minimal required set
 
 ## CSS Guidelines
@@ -121,6 +137,7 @@ Always check `event.source === window` and `event.origin === location.origin`.
 
 ## Code Review Checklist
 
+- [ ] Uses existing utility functions (`views/common/utilities.js`)
 - [ ] Follows naming conventions
 - [ ] No external dependencies added
 - [ ] Uses async/await properly
