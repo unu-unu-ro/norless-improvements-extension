@@ -4,10 +4,11 @@ for [Chrome extension for Norless improvements](README.md) by [@Matei Nicolae](h
 
 Works together with [Project verses from bible.com](https://chromewebstore.google.com/detail/project-verses-from-bible/fklnkmnlobkpoiifnbnemdpamheoanpj) extension.
 
-## 2.7.0 (2026-11-09)
+## 2.7.0 (2026-11-14)
 
 - [x] 🧹 **Old Norless apps removed**: `app.norless.com` and `app-ua.norless.com` are deprecated, so everything for them is gone (right-click menu, playlist save / copy, background, hidden output window, sync to app-ua, closing the output window); only [norless.com](https://norless.com/) is supported
 - [x] 🔗 **Popup**: one **norless.com** button at the top (focuses the open tab, or opens one) instead of the two old apps; the section is named **Project norless.com via bible.com — language per window**; ⚙️ Settings no longer has **Background**
+- [x] 🎨 **New icon**: the Norless "N" logo (from norless.com) inside the cast frame, instead of the old rainbow
 
 ## 2.6.0 (2026-11-08)
 

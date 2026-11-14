@@ -1,25 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 24 24">
   <!--
-    norless extension icon — the app's rainbow (icon-256.png → norless-source.png)
+    norless extension icon — the Norless app's "N" logo (norless/public/icon.svg)
     shown inside a Chrome-"cast"-style TV/projector frame.
     Source of truth: edit this file, then regenerate the PNGs with:
       bash views/icons/build-icons.sh
   -->
   <defs>
-    <!-- Rounded tile used to clip the background + the rainbow "screen". -->
-    <clipPath id="tile">
-      <rect x="0" y="0" width="24" height="24" rx="3.5" ry="3.5"/>
-    </clipPath>
+    <!-- Same dark background + top highlight as the Norless app icon. -->
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#25262a"/>
+      <stop offset="1" stop-color="#141517"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy="0" r=".9">
+      <stop offset="0" stop-color="#fff" stop-opacity=".07"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="1.6" stdDeviation="1.6" flood-color="#000" flood-opacity=".35"/>
+    </filter>
   </defs>
 
-  <!-- Dark "screen" tile — same background as glossa-icon.svg. -->
-  <rect x="0" y="0" width="24" height="24" rx="3.5" ry="3.5" fill="#0f172a"/>
+  <!-- Rounded "screen" tile. -->
+  <rect x="0" y="0" width="24" height="24" rx="3.5" ry="3.5" fill="url(#bg)"/>
+  <rect x="0" y="0" width="24" height="24" rx="3.5" ry="3.5" fill="url(#glow)"/>
 
-  <!-- The rainbow itself, filling the screen, clipped to the rounded tile. -->
-  <image href="norless-source.png" xlink:href="norless-source.png"
-         x="0" y="0" width="24" height="24"
-         preserveAspectRatio="xMidYMid meet" clip-path="url(#tile)"
-         xmlns:xlink="http://www.w3.org/1999/xlink"/>
+  <!--
+    The Norless "N" (paths in the app's 100×100 space), scaled to 0.192 and
+    centred a little up/right of the tile centre (13.5, 11) so its bottom-left
+    corner stays clear of the cast waves.
+  -->
+  <g transform="translate(13.5 11) scale(.192) translate(-50 -50)" filter="url(#shadow)">
+    <path d="M17.77 68.69L17.77 31.31L33.86 23.78L62.61 47.74L62.61 31.31L70.09 31.31L70.09 63.7L29.07 29.52L25.24 31.31L25.24 65.19Z" fill="#f5efe0"/>
+    <path d="M29.91 65.19L29.91 36.3L70.93 70.48L74.76 68.69L74.76 31.31L82.23 31.31L82.23 68.69L66.14 76.22L37.39 52.26L37.39 68.69Z" fill="#cbbd9f"/>
+  </g>
 
   <!--
     Cast-style TV frame (gray) — stroked path inset by 0.75 (= stroke-width/2)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Regenerate the extension PNG icons from norless-icon.svg.
-# The master SVG composites norless-source.png (the raw rainbow) inside a
+# The master SVG draws the Norless "N" logo (vector) inside a
 # Chrome-cast-style frame. Requires librsvg (`brew install librsvg`).
 set -euo pipefail
 cd "$(dirname "$0")"
