@@ -3,7 +3,8 @@
 // =======================
 // The new Norless (https://norless.com) posts a "norless:live" message on its own window
 // with what's live, as plain text in every language (Norless manual: "Messages for
-// extensions"). This file maps one message to the messages for one projection window.
+// extensions"). This file maps one message to the messages for one projection window,
+// and the bible.com extension's "verse" messages back to the page ("norless:verse").
 // No chrome.* / DOM here (unit tested in projection.test.js).
 
 // The mark after the last part of a song.
@@ -118,4 +119,35 @@ function getWindowMessages(live, language, shown) {
     messages.push({ action: "updateText", payload: { text: nextText, markdown: false } });
   }
   return { shown: { text: nextText, frame }, messages };
+}
+
+/**
+ * The projectVerses request for a reading that goes live: bible.com opens and projects it in the
+ * windows that have a language (all of them when both do). Nothing when it's the reading projected
+ * last; anything else going live (or blank) resets it, so the same reading projects again.
+ * @param {Object} live a "norless:live" message, with reading: { usfm: "JHN 3:16-18" } | null
+ * @param {String|null} last the reading projected last
+ * @param {Number[]} indexes the windows with a language, eg. [1, 2]
+ * @return {{last: String|null, payload: {reference: String, index?: Number}|null}}
+ */
+function getReadingRequest(live, last, indexes) {
+  const usfm = !live.blank && live.kind === "reading" && typeof live.reading?.usfm === "string" ? live.reading.usfm : null;
+  if (!usfm || usfm === last || !indexes.length) {
+    return { last: usfm, payload: null };
+  }
+  return { last: usfm, payload: indexes.length === 1 ? { reference: usfm, index: indexes[0] } : { reference: usfm } };
+}
+
+/**
+ * The page message for a "verse" message of the bible.com extension: the reference a window
+ * shows after bible.com projected verses in it (null: cleared). null for any other message.
+ * @param {Object} message eg. { action: "verse", payload: { index: 1, reference: "VDC Ioan 3:16", text } }
+ * @return {{type: "norless:verse", index: Number, reference: String|null}|null}
+ */
+function getVerseMessage(message) {
+  const { index, reference } = (message?.action === "verse" && message.payload) || {};
+  if (index !== 1 && index !== 2) {
+    return null;
+  }
+  return { type: "norless:verse", index, reference: typeof reference === "string" ? reference : null };
 }
