@@ -5,7 +5,7 @@ const vm = require("vm");
 
 const context = vm.createContext({});
 vm.runInContext(fs.readFileSync(path.join(__dirname, "projection.js"), "utf8"), context);
-const { getWindowLanguage, getWindowMessages, getUnknownWindowState, getHelloWindows } = context;
+const { getWindowLanguage, getWindowMessages, getUnknownWindowState, getHelloWindows, getReadingRequest, getVerseMessage } = context;
 const finalCharacter = vm.runInContext("finalCharacter", context);
 
 const chorus = {
@@ -133,5 +133,63 @@ describe("getWindowMessages", () => {
 
   test("unknown window (first message, another tab projected before): any page is removed first", () => {
     expect(actions(getWindowMessages(chorus, "ro", getUnknownWindowState()))).toEqual(['updateFrame:""', "updateText:text"]);
+  });
+});
+
+describe("getReadingRequest", () => {
+  const planned = { ...reading, reading: { usfm: "JHN 3:16-18" } };
+  // Plain JSON, since the vm context has its own Object prototype.
+  const request = (...args) => JSON.parse(JSON.stringify(getReadingRequest(...args)));
+
+  test("a reading going live: projectVerses with its USFM reference, in both windows", () => {
+    expect(request(planned, null, [1, 2])).toEqual({ last: "JHN 3:16-18", payload: { reference: "JHN 3:16-18" } });
+  });
+
+  test("only one window with a language: only that window", () => {
+    expect(request(planned, null, [2])).toEqual({ last: "JHN 3:16-18", payload: { reference: "JHN 3:16-18", index: 2 } });
+  });
+
+  test("no window with a language: nothing is projected (bible.com isn't opened)", () => {
+    expect(request(planned, null, []).payload).toBeNull();
+  });
+
+  test("the reading projected last isn't projected again; another one is", () => {
+    expect(request(planned, "JHN 3:16-18", [1, 2]).payload).toBeNull();
+    expect(request({ ...planned, reading: { usfm: "PSA 23:1-3" } }, "JHN 3:16-18", [1, 2]).payload).toEqual({ reference: "PSA 23:1-3" });
+  });
+
+  test("anything else going live resets the last reading, so the same reading projects again", () => {
+    for (const live of [chorus, page, { ...planned, blank: true }, { ...chorus, kind: null, languages: {} }]) {
+      expect(request(live, "JHN 3:16-18", [1, 2])).toEqual({ last: null, payload: null });
+    }
+    expect(request(planned, null, [1, 2]).payload).toEqual({ reference: "JHN 3:16-18" });
+  });
+
+  test("a reading without a USFM reference: nothing", () => {
+    expect(request(reading, null, [1, 2])).toEqual({ last: null, payload: null });
+    expect(request({ ...reading, reading: null }, null, [1, 2])).toEqual({ last: null, payload: null });
+  });
+});
+
+describe("getVerseMessage", () => {
+  const verse = (payload, action = "verse") => JSON.parse(JSON.stringify(getVerseMessage({ action, payload })));
+
+  test("a window's reference for the page", () => {
+    expect(verse({ index: 1, reference: "VDC Ioan 3:16-18", text: "Fiindcă atât de mult..." })).toEqual({
+      type: "norless:verse",
+      index: 1,
+      reference: "VDC Ioan 3:16-18"
+    });
+  });
+
+  test("a cleared window: reference null", () => {
+    expect(verse({ index: 2, reference: null, text: "" })).toEqual({ type: "norless:verse", index: 2, reference: null });
+  });
+
+  test("anything else: nothing", () => {
+    expect(verse({ index: 1, reference: "x" }, "updateText")).toBeNull();
+    expect(verse({ index: 3, reference: "x" })).toBeNull();
+    expect(verse(undefined)).toBeNull();
+    expect(getVerseMessage(undefined)).toBeNull();
   });
 });
