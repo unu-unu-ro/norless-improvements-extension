@@ -7,7 +7,7 @@ Works together with [Project verses from bible.com](https://chromewebstore.googl
 ## 2.8.0 (soon)
 
 - [x] 📖 **Readings projected by bible.com**: when a planned Bible reading goes live in Norless (`norless:live` with `reading: { usfm: "JHN 3:16-18" }`), bible.com opens the chapter and projects the verses (`projectVerses`), in the windows that have a language; the same reading projects again once live has moved on and comes back to it
-- [x] 🔁 **Norless sees the verses on screen**: the extension listens to what bible.com projects (a reading, or verses clicked on bible.com) and tells the norless.com tab that projects: `norless:verse` with `index` (1 or 2) and `reference` (eg. `"VDC Ioan 3:16-18"`, `null` once the window is cleared); needs [Project verses from bible.com](https://chromewebstore.google.com/detail/project-verses-from-bible/fklnkmnlobkpoiifnbnemdpamheoanpj) with its `verse` messages
+- [x] 🔁 **Norless sees the verses on screen**: the extension listens to what bible.com projects (a reading, or verses clicked on bible.com) and tells the norless.com tab that projects: `norless:verse` with `index` (1 or 2), `reference` (eg. `"VDC Ioan 3:16-18"`, `null` once the window is cleared) and `text` (the verses as the window shows them, one per line, `null` once cleared), so Norless previews each window with its verses; needs [Project verses from bible.com](https://chromewebstore.google.com/detail/project-verses-from-bible/fklnkmnlobkpoiifnbnemdpamheoanpj) with its `verse` messages
 
 ## 2.7.0 (2026-11-14)
 
