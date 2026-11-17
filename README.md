@@ -11,7 +11,7 @@
   - [x] Norless shows each window as a projector in its screens menu, with its language and a preview (the hello tells it the windows)
   - [x] a page up before / after the service is shown full size (`updateFrame`); a Bible reading leaves the window to bible.com
   - [x] a planned Bible reading going live is opened and projected by bible.com (`projectVerses` with its USFM reference, eg. `JHN 3:16-18`), only in the windows with a language
-  - [x] what bible.com projects (a reading, or verses clicked there) is told to Norless: `norless:verse` with the window and its reference (`null` once cleared)
+  - [x] what bible.com projects (a reading, or verses clicked there) is told to Norless: `norless:verse` with the window, its reference and its verses' text (`null` once cleared)
   - [x] with several norless.com tabs open, the tab focused last projects
 - [x] 🔗 toolbar popup → **norless.com** button: focuses the open norless.com tab, or opens one
 - [x] 🖼️ toolbar popup → **slide pages**: live previews of configurable pages (⚙️ Settings → Slides), click one to project it full size, click again to clear

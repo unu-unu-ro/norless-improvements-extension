@@ -174,16 +174,17 @@ describe("getReadingRequest", () => {
 describe("getVerseMessage", () => {
   const verse = (payload, action = "verse") => JSON.parse(JSON.stringify(getVerseMessage({ action, payload })));
 
-  test("a window's reference for the page", () => {
+  test("a window's reference and text for the page", () => {
     expect(verse({ index: 1, reference: "VDC Ioan 3:16-18", text: "Fiindcă atât de mult..." })).toEqual({
       type: "norless:verse",
       index: 1,
-      reference: "VDC Ioan 3:16-18"
+      reference: "VDC Ioan 3:16-18",
+      text: "Fiindcă atât de mult..."
     });
   });
 
   test("a cleared window: reference null", () => {
-    expect(verse({ index: 2, reference: null, text: "" })).toEqual({ type: "norless:verse", index: 2, reference: null });
+    expect(verse({ index: 2, reference: null, text: "" })).toEqual({ type: "norless:verse", index: 2, reference: null, text: null });
   });
 
   test("anything else: nothing", () => {

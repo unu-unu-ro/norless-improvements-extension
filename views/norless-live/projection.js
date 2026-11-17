@@ -139,15 +139,16 @@ function getReadingRequest(live, last, indexes) {
 }
 
 /**
- * The page message for a "verse" message of the bible.com extension: the reference a window
+ * The page message for a "verse" message of the bible.com extension: the reference and text a window
  * shows after bible.com projected verses in it (null: cleared). null for any other message.
  * @param {Object} message eg. { action: "verse", payload: { index: 1, reference: "VDC Ioan 3:16", text } }
- * @return {{type: "norless:verse", index: Number, reference: String|null}|null}
+ * @return {{type: "norless:verse", index: Number, reference: String|null, text: String|null}|null}
  */
 function getVerseMessage(message) {
-  const { index, reference } = (message?.action === "verse" && message.payload) || {};
+  const { index, reference, text } = (message?.action === "verse" && message.payload) || {};
   if (index !== 1 && index !== 2) {
     return null;
   }
-  return { type: "norless:verse", index, reference: typeof reference === "string" ? reference : null };
+  const shown = typeof reference === "string" ? reference : null;
+  return { type: "norless:verse", index, reference: shown, text: shown && typeof text === "string" ? text : null };
 }
