@@ -101,7 +101,9 @@ function reproject() {
 // The tab focused last projects
 // =======================
 function claimProjection() {
-  chrome.storage.local.set({ [NORLESS_ACTIVE_TAB_KEY]: norlessTabId });
+  chrome.storage.local.set({
+    [NORLESS_ACTIVE_TAB_KEY]: norlessTabId
+  });
 }
 
 window.addEventListener("focus", claimProjection);

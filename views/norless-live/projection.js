@@ -101,7 +101,10 @@ function getWindowMessages(live, language, shown) {
     if (frame !== live.page) {
       messages.push({ action: "updateFrame", payload: { url: live.page } });
     }
-    return { shown: { text, frame: live.page }, messages };
+    return {
+      shown: { text, frame: live.page },
+      messages
+    };
   }
 
   if (frame !== "") {
@@ -111,14 +114,20 @@ function getWindowMessages(live, language, shown) {
 
   if (!live.blank && live.kind === "reading") {
     // bible.com replaces the text with its verses
-    return { shown: { text: null, frame }, messages };
+    return {
+      shown: { text: null, frame },
+      messages
+    };
   }
 
   const nextText = live.blank || !live.kind ? "" : getLiveText(live, language);
   if (nextText !== text) {
     messages.push({ action: "updateText", payload: { text: nextText, markdown: false } });
   }
-  return { shown: { text: nextText, frame }, messages };
+  return {
+    shown: { text: nextText, frame },
+    messages
+  };
 }
 
 /**
@@ -135,7 +144,10 @@ function getReadingRequest(live, last, indexes) {
   if (!usfm || usfm === last || !indexes.length) {
     return { last: usfm, payload: null };
   }
-  return { last: usfm, payload: indexes.length === 1 ? { reference: usfm, index: indexes[0] } : { reference: usfm } };
+  return {
+    last: usfm,
+    payload: indexes.length === 1 ? { reference: usfm, index: indexes[0] } : { reference: usfm }
+  };
 }
 
 /**
@@ -150,5 +162,10 @@ function getVerseMessage(message) {
     return null;
   }
   const shown = typeof reference === "string" ? reference : null;
-  return { type: "norless:verse", index, reference: shown, text: shown && typeof text === "string" ? text : null };
+  return {
+    type: "norless:verse",
+    index,
+    reference: shown,
+    text: shown && typeof text === "string" ? text : null
+  };
 }
